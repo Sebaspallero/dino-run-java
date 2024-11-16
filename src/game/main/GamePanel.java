@@ -1,6 +1,5 @@
 package game.main;
 
-/* import javax.swing.*; */
 import java.awt.*;
 
 import game.entities.Dinosaur;
