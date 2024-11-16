@@ -3,6 +3,7 @@ package game.main;
 import java.awt.*;
 
 import game.entities.Dinosaur;
+import game.sound.SoundPlayer;
 
 import javax.swing.JPanel;
 
@@ -11,19 +12,23 @@ public class GamePanel extends JPanel implements Runnable{
     private Dinosaur dinosaur;
     private boolean running;
     private KeyHandler keyHandler;
+    private SoundPlayer soundPlayer;
    
 
     public GamePanel(){
         this.dinosaur = new Dinosaur();
         this.running = true;
         this.keyHandler = new KeyHandler(dinosaur);
+        this.soundPlayer = new SoundPlayer();
         addKeyListener(keyHandler);
         setFocusable(true);
+        soundPlayer.setFile(1);
     }
 
     public void startGame(){
         this.running = true;
         new Thread(this).start();
+        soundPlayer.play();
     }
 
 
