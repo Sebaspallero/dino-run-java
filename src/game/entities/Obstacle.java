@@ -8,7 +8,7 @@ public class Obstacle {
     private int x, y, width, height, speed;
     private Image image;
 
-    private static final int GROUND_Y = 300 - 50;
+    private static final int GROUND_Y = 300 - 118;
     private static final int SPAWN_X = 800;
 
     public Obstacle(int width, int height, int speed) {
@@ -19,7 +19,7 @@ public class Obstacle {
         this.speed = speed;
 
         try {
-            image = ImageIO.read(getClass().getResource("/resources/sprites/cactus-001.png"));
+            image = ImageIO.read(getClass().getResource("/resources/sprites/spikes-001.png"));
         } catch (IOException e) {
             e.printStackTrace();
         }
