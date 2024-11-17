@@ -11,7 +11,7 @@ public class Dinosaur {
 
     private static final int GROUND_Y = 300 - 29; //The position of the ground
     private static final double GRAVITY = 1;
-    private static final int JUMP_STRENGTH = -15;
+    private static final int JUMP_STRENGTH = -17;
 
     //Constructor
     public Dinosaur() {

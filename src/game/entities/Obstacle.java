@@ -1,11 +1,14 @@
 package game.entities;
 import java.awt.*;
+import java.io.IOException;
+import javax.imageio.ImageIO;
 
 public class Obstacle {
 
     private int x, y, width, height, speed;
+    private Image image;
 
-    private static final int GROUND_Y = 300 - 20;
+    private static final int GROUND_Y = 300 - 50;
     private static final int SPAWN_X = 800;
 
     public Obstacle(int width, int height, int speed) {
@@ -14,6 +17,12 @@ public class Obstacle {
         this.width = width;
         this.height = height;
         this.speed = speed;
+
+        try {
+            image = ImageIO.read(getClass().getResource("/resources/sprites/cactus-001.png"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void update() {
@@ -25,8 +34,12 @@ public class Obstacle {
     }
 
     public void draw(Graphics g) {
-        g.setColor(Color.BLUE);         
-        g.fillRect(x, y, width, height); 
+        if (image != null) {
+            g.drawImage(image, x, y, width, height, null);
+        }else{
+            g.setColor(Color.BLUE);         
+            g.fillRect(x, y, width, height); 
+        }
     }
 
     public int getX() {

@@ -100,8 +100,8 @@ public class GamePanel extends JPanel implements Runnable {
 
         // Generar un nuevo obstáculo si ha pasado suficiente tiempo
         if (currentTime - lastObstacleTime >= obstacleInterval) {
-            int width = random.nextInt(30) + 20; // Ancho entre 20 y 50 px
-            int height = random.nextInt(40) + 30; // Alto entre 30 y 70 px
+            int width = 53;//random.nextInt(30) + 20; // Ancho entre 20 y 50 px
+            int height = 64;//random.nextInt(40) + 30; // Alto entre 30 y 70 px
 
             obstacleList.add(new Obstacle(width, height, currentSpeed));
             lastObstacleTime = currentTime;
