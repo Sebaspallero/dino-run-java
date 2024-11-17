@@ -3,6 +3,7 @@ package game.main;
 import java.awt.*;
 
 import game.entities.Dinosaur;
+import game.entities.Floor;
 import game.entities.Obstacle;
 import game.sound.SoundPlayer;
 
@@ -15,6 +16,9 @@ public class GamePanel extends JPanel implements Runnable {
 
     private Dinosaur dinosaur;
     private List<Obstacle> obstacleList;
+    private Floor floor;
+    
+
     private boolean running;
     private boolean gameOver;
 
@@ -35,6 +39,8 @@ public class GamePanel extends JPanel implements Runnable {
 
         this.dinosaur = new Dinosaur();
         this.obstacleList = new ArrayList<>();
+        this.floor = new Floor(currentSpeed);
+
 
         this.keyHandler = new KeyHandler(dinosaur);
         this.soundPlayer = new SoundPlayer();
@@ -71,6 +77,7 @@ public class GamePanel extends JPanel implements Runnable {
         }
 
         dinosaur.update();
+        floor.update();
 
         for (int i = 0; i < obstacleList.size(); i++) {
             Obstacle obstacle = obstacleList.get(i);
@@ -99,8 +106,8 @@ public class GamePanel extends JPanel implements Runnable {
 
         // Generar un nuevo obstáculo si ha pasado suficiente tiempo
         if (currentTime - lastObstacleTime >= obstacleInterval) {
-            int width = 53;//random.nextInt(30) + 20; // Ancho entre 20 y 50 px
-            int height = 64;//random.nextInt(40) + 30; // Alto entre 30 y 70 px
+            int width = 24;//random.nextInt(30) + 20; // Ancho entre 20 y 50 px
+            int height = 24;//random.nextInt(40) + 30; // Alto entre 30 y 70 px
 
             obstacleList.add(new Obstacle(width, height, currentSpeed));
             lastObstacleTime = currentTime;
@@ -133,6 +140,7 @@ public class GamePanel extends JPanel implements Runnable {
             g.drawString("GAME OVER!", getWidth() / 2 - 150, getHeight() / 2);
         }
 
+        floor.draw(g);
         dinosaur.draw(g);
 
         for (Obstacle obstacle : obstacleList) {
