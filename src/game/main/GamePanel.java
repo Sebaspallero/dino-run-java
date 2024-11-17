@@ -2,13 +2,14 @@ package game.main;
 
 import java.awt.*;
 
+import game.entities.Background;
 import game.entities.Dinosaur;
+import game.entities.Floor;
 import game.entities.Obstacle;
 import game.sound.SoundPlayer;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import javax.swing.JPanel;
 
@@ -16,6 +17,10 @@ public class GamePanel extends JPanel implements Runnable {
 
     private Dinosaur dinosaur;
     private List<Obstacle> obstacleList;
+    private Floor floor;
+    private Background background;
+    
+
     private boolean running;
     private boolean gameOver;
 
@@ -28,17 +33,19 @@ public class GamePanel extends JPanel implements Runnable {
     private long lastSpeedIncreaseTime = System.currentTimeMillis();
     private long speedIncreaseInterval = 10000; // Incrementar velocidad cada 10 segundos
 
-    private Random random;
+
+    public static final int GROUND_HEIGHT = 50;
 
     public GamePanel() {
         this.running = true;
 
         this.dinosaur = new Dinosaur();
         this.obstacleList = new ArrayList<>();
+        this.floor = new Floor(currentSpeed);
+        this.background = new Background();
 
         this.keyHandler = new KeyHandler(dinosaur);
         this.soundPlayer = new SoundPlayer();
-        this.random = new Random();
         this.gameOver = false;
 
         addKeyListener(keyHandler);
@@ -72,6 +79,8 @@ public class GamePanel extends JPanel implements Runnable {
         }
 
         dinosaur.update();
+        floor.update();
+        /* background.update(currentSpeed); */
 
         for (int i = 0; i < obstacleList.size(); i++) {
             Obstacle obstacle = obstacleList.get(i);
@@ -100,8 +109,8 @@ public class GamePanel extends JPanel implements Runnable {
 
         // Generar un nuevo obstáculo si ha pasado suficiente tiempo
         if (currentTime - lastObstacleTime >= obstacleInterval) {
-            int width = random.nextInt(30) + 20; // Ancho entre 20 y 50 px
-            int height = random.nextInt(40) + 30; // Alto entre 30 y 70 px
+            int width = 48;//random.nextInt(30) + 20; // Ancho entre 20 y 50 px
+            int height = 48;//random.nextInt(40) + 30; // Alto entre 30 y 70 px
 
             obstacleList.add(new Obstacle(width, height, currentSpeed));
             lastObstacleTime = currentTime;
@@ -126,18 +135,20 @@ public class GamePanel extends JPanel implements Runnable {
 
         super.paintComponent(g);
 
-        setBackground(Color.WHITE);
+        
+
+        background.draw(g, getWidth(), getHeight());
+        floor.draw(g);
+        dinosaur.draw(g);
+
+        for (Obstacle obstacle : obstacleList) {
+            obstacle.draw(g);
+        }
 
         if (gameOver) {
             g.setColor(Color.RED);
             g.setFont(g.getFont().deriveFont(50.0f));
             g.drawString("GAME OVER!", getWidth() / 2 - 150, getHeight() / 2);
-        }
-
-        dinosaur.draw(g);
-
-        for (Obstacle obstacle : obstacleList) {
-            obstacle.draw(g);
         }
     }
 
