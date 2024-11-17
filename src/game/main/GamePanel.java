@@ -2,6 +2,7 @@ package game.main;
 
 import java.awt.*;
 
+import game.entities.Background;
 import game.entities.Dinosaur;
 import game.entities.Floor;
 import game.entities.Obstacle;
@@ -17,6 +18,7 @@ public class GamePanel extends JPanel implements Runnable {
     private Dinosaur dinosaur;
     private List<Obstacle> obstacleList;
     private Floor floor;
+    private Background background;
     
 
     private boolean running;
@@ -40,7 +42,7 @@ public class GamePanel extends JPanel implements Runnable {
         this.dinosaur = new Dinosaur();
         this.obstacleList = new ArrayList<>();
         this.floor = new Floor(currentSpeed);
-
+        this.background = new Background();
 
         this.keyHandler = new KeyHandler(dinosaur);
         this.soundPlayer = new SoundPlayer();
@@ -78,6 +80,7 @@ public class GamePanel extends JPanel implements Runnable {
 
         dinosaur.update();
         floor.update();
+        /* background.update(currentSpeed); */
 
         for (int i = 0; i < obstacleList.size(); i++) {
             Obstacle obstacle = obstacleList.get(i);
@@ -106,8 +109,8 @@ public class GamePanel extends JPanel implements Runnable {
 
         // Generar un nuevo obstáculo si ha pasado suficiente tiempo
         if (currentTime - lastObstacleTime >= obstacleInterval) {
-            int width = 24;//random.nextInt(30) + 20; // Ancho entre 20 y 50 px
-            int height = 24;//random.nextInt(40) + 30; // Alto entre 30 y 70 px
+            int width = 48;//random.nextInt(30) + 20; // Ancho entre 20 y 50 px
+            int height = 48;//random.nextInt(40) + 30; // Alto entre 30 y 70 px
 
             obstacleList.add(new Obstacle(width, height, currentSpeed));
             lastObstacleTime = currentTime;
@@ -132,19 +135,20 @@ public class GamePanel extends JPanel implements Runnable {
 
         super.paintComponent(g);
 
-        setBackground(Color.WHITE);
+        
 
-        if (gameOver) {
-            g.setColor(Color.RED);
-            g.setFont(g.getFont().deriveFont(50.0f));
-            g.drawString("GAME OVER!", getWidth() / 2 - 150, getHeight() / 2);
-        }
-
+        background.draw(g, getWidth(), getHeight());
         floor.draw(g);
         dinosaur.draw(g);
 
         for (Obstacle obstacle : obstacleList) {
             obstacle.draw(g);
+        }
+
+        if (gameOver) {
+            g.setColor(Color.RED);
+            g.setFont(g.getFont().deriveFont(50.0f));
+            g.drawString("GAME OVER!", getWidth() / 2 - 150, getHeight() / 2);
         }
     }
 
