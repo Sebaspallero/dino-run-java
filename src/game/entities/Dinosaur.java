@@ -16,7 +16,7 @@ public class Dinosaur {
     private Animator animator;
     private Image spriteSheet;
 
-    private static final int GROUND_Y = 300 - 57; //The position of the ground
+    private static final int GROUND_Y = 300 - 138; //The position of the ground
     private static final double GRAVITY = 1;
     private static final int JUMP_STRENGTH = -17;
 
