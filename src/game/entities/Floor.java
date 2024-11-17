@@ -11,18 +11,18 @@ import game.main.DinoGame;
 public class Floor {
 
     private int x, y, width, height;
-    private int speed;
+    private double speed;
     private int screen_width;
     private Image image;
 
 
-    public Floor(int speed) {
+    public Floor() {
         this.screen_width = DinoGame.SCREEN_WIDTH;
         this.width = 750*2;
         this.height = 60*2;
         this.x = 0;
         this.y = DinoGame.SCREEN_HEIGHT - height;
-        this.speed = speed;
+        this.speed = 5;
        
 
         try {
@@ -32,7 +32,8 @@ public class Floor {
         }
     }
 
-    public void update(){
+    public void update(double deltaTime, int newSpeed){
+        this.speed = newSpeed * deltaTime;;
         x -= speed;
         if (x + width <= 0) {
             x = 0;
