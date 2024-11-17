@@ -32,7 +32,7 @@ public class GamePanel extends JPanel implements Runnable {
     private long lastObstacleTime = System.currentTimeMillis();
     private long obstacleInterval = 2000; // Tiempo entre obstáculos (en ms)
     private long lastSpeedIncreaseTime = System.currentTimeMillis();
-    private long speedIncreaseInterval = 10000; // Incrementar velocidad cada 10 segundos
+    private long speedIncreaseInterval = 20000; // Incrementar velocidad cada 10 segundos
 
 
     public static final int GROUND_HEIGHT = 50;
@@ -97,13 +97,12 @@ public class GamePanel extends JPanel implements Runnable {
 
         dinosaur.update();
         floor.update();
-        /* background.update(currentSpeed); */
 
         for (int i = 0; i < obstacleList.size(); i++) {
             Obstacle obstacle = obstacleList.get(i);
             obstacle.update();
 
-            if (dinosaur.checkCollision(obstacle)) {
+            if (dinosaur.geHitbox().intersects(obstacle.getHitbox())) {
                 gameOver = true; // Terminar el juego en caso de colisión
             }
 

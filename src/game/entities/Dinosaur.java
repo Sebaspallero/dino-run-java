@@ -15,6 +15,7 @@ public class Dinosaur {
 
     private Animator animator;
     private Image spriteSheet;
+    private Hitbox hitbox;
 
     private static final int GROUND_Y = 300 - 138; //The position of the ground
     private static final double GRAVITY = 1;
@@ -28,6 +29,8 @@ public class Dinosaur {
         this.height = 68; //Height of the dinosaur
         this.velocityY = 0; //Vertical speed
         this.jumping = false; //Check if dinosaur is in the air
+
+        this.hitbox = new Hitbox(x + 5, y + 5, (int) (height * 0.8), (int) (width * 0.8));
 
         try {
             spriteSheet = ImageIO.read(getClass().getResource("/resources/sprites/dinosaur-jump-sheet.png"));
@@ -50,6 +53,7 @@ public class Dinosaur {
             }
         }
         animator.update();
+        hitbox.update(x + 5, y + 5);
     }
 
     public void jump() {
@@ -59,18 +63,18 @@ public class Dinosaur {
         }
     }
 
-    public boolean checkCollision(Obstacle obstacle) {
-        return x + width > obstacle.getX() && x < obstacle.getX() + obstacle.getWidth() &&
-               y + height > obstacle.getY() && y < obstacle.getY() + obstacle.getHeight();
-    }
-
     public void draw(Graphics g) {
         if (spriteSheet != null) {
             animator.draw(g, x, y, width, height);
+            hitbox.draw(g);
         }else{
-            g.setColor(Color.BLACK);         // Color del dinosaurio
-            g.fillRect(x, y, width, height); // Dibuja un rectángulo en la posición actual
+            g.setColor(Color.BLACK);         
+            g.fillRect(x, y, width, height);
         }
        
+    }
+
+    public Hitbox geHitbox(){
+        return this.hitbox;
     }
 }
