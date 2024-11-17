@@ -8,7 +8,6 @@ import game.sound.SoundPlayer;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import javax.swing.JPanel;
 
@@ -28,7 +27,6 @@ public class GamePanel extends JPanel implements Runnable {
     private long lastSpeedIncreaseTime = System.currentTimeMillis();
     private long speedIncreaseInterval = 10000; // Incrementar velocidad cada 10 segundos
 
-    private Random random;
 
     public static final int GROUND_HEIGHT = 50;
 
@@ -40,7 +38,6 @@ public class GamePanel extends JPanel implements Runnable {
 
         this.keyHandler = new KeyHandler(dinosaur);
         this.soundPlayer = new SoundPlayer();
-        this.random = new Random();
         this.gameOver = false;
 
         addKeyListener(keyHandler);
