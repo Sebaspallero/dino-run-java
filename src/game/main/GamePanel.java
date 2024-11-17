@@ -82,6 +82,7 @@ public class GamePanel extends JPanel implements Runnable {
         this.lastObstacleTime = System.currentTimeMillis();
         this.lastSpeedIncreaseTime = System.currentTimeMillis();
         this.obstacleList.clear(); // Limpia los obstáculos existentes
+        this.obstacleInterval = 2000;
     
         this.dinosaur = new Dinosaur(); // Crea un nuevo dinosaurio
         this.floor = new Floor(); // Reinicia el suelo
