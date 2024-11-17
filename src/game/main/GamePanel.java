@@ -46,7 +46,7 @@ public class GamePanel extends JPanel implements Runnable {
         this.background = new Background();
         customFont = FontLoader.loadFont("/resources/font/PixelOperator8-Bold.ttf", 24f);
 
-        this.keyHandler = new KeyHandler(dinosaur);
+        this.keyHandler = new KeyHandler(dinosaur,this);
         this.soundPlayer = new SoundPlayer();
         this.gameOver = false;
 
@@ -60,6 +60,21 @@ public class GamePanel extends JPanel implements Runnable {
         this.running = true;
         new Thread(this).start();
         soundPlayer.play();
+    }
+
+    public void resetGame(){
+        this.running = true;
+        this.gameOver = false;
+        this.currentSpeed = 5; // Reinicia la velocidad
+        this.lastObstacleTime = System.currentTimeMillis();
+        this.lastSpeedIncreaseTime = System.currentTimeMillis();
+        this.obstacleList.clear(); // Limpia los obstáculos existentes
+    
+        this.dinosaur = new Dinosaur(); // Crea un nuevo dinosaurio
+        this.floor = new Floor(currentSpeed); // Reinicia el suelo
+        this.background = new Background(); // Reinicia el fondo
+
+        this.keyHandler.setDinosaur(this.dinosaur);
     }
 
     @Override
@@ -152,4 +167,7 @@ public class GamePanel extends JPanel implements Runnable {
         }
     }
 
+    public boolean isGameOver() {
+        return gameOver;
+    }
 }
