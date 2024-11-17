@@ -1,6 +1,10 @@
 package game.entities;
 import java.awt.*;
 
+import javax.imageio.ImageIO;
+
+import game.main.Animator;
+
 //The main character of the game, includes the position, speed, jump logic
 public class Dinosaur {
 
@@ -9,7 +13,10 @@ public class Dinosaur {
     private int velocityY; 
     private boolean jumping; 
 
-    private static final int GROUND_Y = 300 - 29; //The position of the ground
+    private Animator animator;
+    private Image spriteSheet;
+
+    private static final int GROUND_Y = 300 - 57; //The position of the ground
     private static final double GRAVITY = 1;
     private static final int JUMP_STRENGTH = -17;
 
@@ -17,10 +24,18 @@ public class Dinosaur {
     public Dinosaur() {
         this.x = 50; //Position of the dinosaur on the screen horizontally (fixed)
         this.y = GROUND_Y; // Position of the dinosaur on the screen vertically
-        this.width = 40; //Width of the dinosaur
-        this.height = 40; //Height of the dinosaur
+        this.width = 60; //Width of the dinosaur
+        this.height = 68; //Height of the dinosaur
         this.velocityY = 0; //Vertical speed
         this.jumping = false; //Check if dinosaur is in the air
+
+        try {
+            spriteSheet = ImageIO.read(getClass().getResource("/resources/sprites/dinosaur-jump-sheet.png"));
+            animator = new Animator(spriteSheet, width, height, 6, 100, 0);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
     }
 
     public void update() {
@@ -28,12 +43,13 @@ public class Dinosaur {
             velocityY += GRAVITY;
             y += velocityY;
 
-            if (y == GROUND_Y) {
+            if (y >= GROUND_Y) {
                 y = GROUND_Y;
                 jumping = false;
                 velocityY = 0;
             }
         }
+        animator.update();
     }
 
     public void jump() {
@@ -49,7 +65,12 @@ public class Dinosaur {
     }
 
     public void draw(Graphics g) {
-        g.setColor(Color.BLACK);         // Color del dinosaurio
-        g.fillRect(x, y, width, height); // Dibuja un rectángulo en la posición actual
+        if (spriteSheet != null) {
+            animator.draw(g, x, y, width, height);
+        }else{
+            g.setColor(Color.BLACK);         // Color del dinosaurio
+            g.fillRect(x, y, width, height); // Dibuja un rectángulo en la posición actual
+        }
+       
     }
 }
