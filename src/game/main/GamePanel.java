@@ -19,8 +19,11 @@ public class GamePanel extends JPanel implements Runnable {
     private List<Obstacle> obstacleList;
     private Floor floor;
     private Background background;
+    private Font customBoldFont;
     private Font customFont;
-    
+    private int score;
+    private int scoreTimer;
+    private final int SCORE_DELAY = 7;
 
     private boolean running;
     private boolean gameOver;
@@ -32,7 +35,7 @@ public class GamePanel extends JPanel implements Runnable {
     private long lastObstacleTime = System.currentTimeMillis();
     private long obstacleInterval = 2000; // Tiempo entre obstáculos (en ms)
     private long lastSpeedIncreaseTime = System.currentTimeMillis();
-    private long speedIncreaseInterval = 20000; // Incrementar velocidad cada 10 segundos
+    private long speedIncreaseInterval = 15000; // Incrementar velocidad cada 10 segundos
 
 
     public static final int GROUND_HEIGHT = 50;
@@ -44,21 +47,26 @@ public class GamePanel extends JPanel implements Runnable {
         this.obstacleList = new ArrayList<>();
         this.floor = new Floor(currentSpeed);
         this.background = new Background();
-        customFont = FontLoader.loadFont("/resources/font/PixelOperator8-Bold.ttf", 24f);
+        this.score = 0;
+        this.scoreTimer = 0;
+        
+
+        customFont = FontLoader.loadFont("/resources/font/PixelOperator8.ttf", 16f);
+        customBoldFont = FontLoader.loadFont("/resources/font/PixelOperator8-Bold.ttf", 24f);
 
         this.keyHandler = new KeyHandler(dinosaur,this);
         this.soundPlayer = new SoundPlayer();
-        this.gameOver = false;
+        this.gameOver = true;
 
         addKeyListener(keyHandler);
         setFocusable(true);
-        soundPlayer.setFile(1);
-
+        
     }
 
     public void startGame() {
         this.running = true;
         new Thread(this).start();
+        soundPlayer.setFile(1);
         soundPlayer.play();
     }
 
@@ -73,6 +81,7 @@ public class GamePanel extends JPanel implements Runnable {
         this.dinosaur = new Dinosaur(); // Crea un nuevo dinosaurio
         this.floor = new Floor(currentSpeed); // Reinicia el suelo
         this.background = new Background(); // Reinicia el fondo
+        this.score = 0;
 
         this.keyHandler.setDinosaur(this.dinosaur);
     }
@@ -98,11 +107,21 @@ public class GamePanel extends JPanel implements Runnable {
         dinosaur.update();
         floor.update();
 
+        scoreTimer++; 
+
+        if (scoreTimer >= SCORE_DELAY) {
+            score++; // Incrementar el puntaje
+            scoreTimer = 0; // Restablecer el contador
+        }
+       
+
         for (int i = 0; i < obstacleList.size(); i++) {
             Obstacle obstacle = obstacleList.get(i);
             obstacle.update();
 
             if (dinosaur.geHitbox().intersects(obstacle.getHitbox())) {
+                soundPlayer.setFile(2);
+                soundPlayer.play();
                 gameOver = true; // Terminar el juego en caso de colisión
             }
 
@@ -159,10 +178,34 @@ public class GamePanel extends JPanel implements Runnable {
             obstacle.draw(g);
         }
 
+        g.setColor(Color.WHITE);
+        g.setFont(customFont);
+        g.drawString("Score: " + score, 20, 20);
+
         if (gameOver) {
             g.setColor(Color.RED); 
+            g.setFont(customBoldFont);
+
+            FontMetrics metrics = g.getFontMetrics(customBoldFont);
+            String gameOver = "GAME OVER";
+            int gameOverX = (getWidth() - metrics.stringWidth(gameOver)) / 2;
+            int gameOverY = getHeight() / 2 - 20;
+            g.drawString(gameOver, gameOverX, gameOverY);
+
+           
             g.setFont(customFont);
-            g.drawString("GAME OVER!", getWidth() / 2 - 150, getHeight() / 2);
+            metrics = g.getFontMetrics(customFont);
+
+            String scoreText = "Your score is: " + score;
+            int scoreX = (getWidth() - metrics.stringWidth(scoreText)) / 2;
+            int scoreY = gameOverY + 30;
+            g.drawString(scoreText, scoreX, scoreY);
+            
+
+            String restartText = "Press spacebar to play again!";
+            int restartX = (getWidth() - metrics.stringWidth(restartText)) / 2;
+            int restartY = scoreY + 30;
+            g.drawString(restartText, restartX, restartY);
         }
     }
 

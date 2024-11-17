@@ -66,7 +66,7 @@ public class Dinosaur {
     public void draw(Graphics g) {
         if (spriteSheet != null) {
             animator.draw(g, x, y, width, height);
-            hitbox.draw(g);
+           /*  hitbox.draw(g); */
         }else{
             g.setColor(Color.BLACK);         
             g.fillRect(x, y, width, height);
