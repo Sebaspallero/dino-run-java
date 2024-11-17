@@ -43,6 +43,11 @@ public class Dinosaur {
         }
     }
 
+    public boolean checkCollision(Obstacle obstacle) {
+        return x + width > obstacle.getX() && x < obstacle.getX() + obstacle.getWidth() &&
+               y + height > obstacle.getY() && y < obstacle.getY() + obstacle.getHeight();
+    }
+
     public void draw(Graphics g) {
         g.setColor(Color.BLACK);         // Color del dinosaurio
         g.fillRect(x, y, width, height); // Dibuja un rectángulo en la posición actual

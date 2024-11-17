@@ -1,32 +1,57 @@
 package game.main;
 
-/* import javax.swing.*; */
 import java.awt.*;
 
 import game.entities.Dinosaur;
+import game.entities.Obstacle;
+import game.sound.SoundPlayer;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 import javax.swing.JPanel;
 
-public class GamePanel extends JPanel implements Runnable{
+public class GamePanel extends JPanel implements Runnable {
 
     private Dinosaur dinosaur;
+    private List<Obstacle> obstacleList;
     private boolean running;
-    private KeyHandler keyHandler;
-   
+    private boolean gameOver;
 
-    public GamePanel(){
-        this.dinosaur = new Dinosaur();
+    private KeyHandler keyHandler;
+    private SoundPlayer soundPlayer;
+
+    private int currentSpeed = 5; // Velocidad inicial de los obstáculos
+    private long lastObstacleTime = System.currentTimeMillis();
+    private long obstacleInterval = 2000; // Tiempo entre obstáculos (en ms)
+    private long lastSpeedIncreaseTime = System.currentTimeMillis();
+    private long speedIncreaseInterval = 10000; // Incrementar velocidad cada 10 segundos
+
+    private Random random;
+
+    public GamePanel() {
         this.running = true;
+
+        this.dinosaur = new Dinosaur();
+        this.obstacleList = new ArrayList<>();
+
         this.keyHandler = new KeyHandler(dinosaur);
+        this.soundPlayer = new SoundPlayer();
+        this.random = new Random();
+        this.gameOver = false;
+
         addKeyListener(keyHandler);
         setFocusable(true);
+        soundPlayer.setFile(1);
+
     }
 
-    public void startGame(){
+    public void startGame() {
         this.running = true;
         new Thread(this).start();
+        soundPlayer.play();
     }
-
 
     @Override
     public void run() {
@@ -42,14 +67,78 @@ public class GamePanel extends JPanel implements Runnable{
     }
 
     private void updateGame() {
+        if (gameOver) {
+            return; // Si el juego está terminado, no actualizamos más
+        }
+
         dinosaur.update();
+
+        for (int i = 0; i < obstacleList.size(); i++) {
+            Obstacle obstacle = obstacleList.get(i);
+            obstacle.update();
+
+            if (dinosaur.checkCollision(obstacle)) {
+                gameOver = true; // Terminar el juego en caso de colisión
+            }
+
+            // Eliminar obstáculos fuera de pantalla
+            if (obstacle.isOutOfScreen()) {
+                obstacleList.remove(i);
+                i--;
+            }
+        }
+
+        // Generar nuevos obstáculos
+        generateObstacles();
+
+        // Incrementar velocidad con el tiempo
+        increaseSpeed();
+    }
+
+    private void generateObstacles() {
+        long currentTime = System.currentTimeMillis();
+
+        // Generar un nuevo obstáculo si ha pasado suficiente tiempo
+        if (currentTime - lastObstacleTime >= obstacleInterval) {
+            int width = random.nextInt(30) + 20; // Ancho entre 20 y 50 px
+            int height = random.nextInt(40) + 30; // Alto entre 30 y 70 px
+
+            obstacleList.add(new Obstacle(width, height, currentSpeed));
+            lastObstacleTime = currentTime;
+        }
+    }
+
+    private void increaseSpeed() {
+        long currentTime = System.currentTimeMillis();
+
+        // Incrementar la velocidad cada `speedIncreaseInterval`
+        if (currentTime - lastSpeedIncreaseTime >= speedIncreaseInterval) {
+            currentSpeed++;
+            lastSpeedIncreaseTime = currentTime;
+
+            // Opcional: reduce el tiempo entre obstáculos para aumentar dificultad
+            obstacleInterval = Math.max(500, obstacleInterval - 200);
+        }
     }
 
     @Override
     protected void paintComponent(Graphics g) {
+
         super.paintComponent(g);
+
         setBackground(Color.WHITE);
+
+        if (gameOver) {
+            g.setColor(Color.RED);
+            g.setFont(g.getFont().deriveFont(50.0f));
+            g.drawString("GAME OVER!", getWidth() / 2 - 150, getHeight() / 2);
+        }
+
         dinosaur.draw(g);
+
+        for (Obstacle obstacle : obstacleList) {
+            obstacle.draw(g);
+        }
     }
 
 }
