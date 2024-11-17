@@ -30,6 +30,8 @@ public class GamePanel extends JPanel implements Runnable {
 
     private Random random;
 
+    public static final int GROUND_HEIGHT = 50;
+
     public GamePanel() {
         this.running = true;
 
