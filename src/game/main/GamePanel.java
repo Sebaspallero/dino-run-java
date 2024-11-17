@@ -19,6 +19,7 @@ public class GamePanel extends JPanel implements Runnable {
     private List<Obstacle> obstacleList;
     private Floor floor;
     private Background background;
+    private Font customFont;
     
 
     private boolean running;
@@ -43,6 +44,7 @@ public class GamePanel extends JPanel implements Runnable {
         this.obstacleList = new ArrayList<>();
         this.floor = new Floor(currentSpeed);
         this.background = new Background();
+        customFont = FontLoader.loadFont("/resources/font/PixelOperator8-Bold.ttf", 24f);
 
         this.keyHandler = new KeyHandler(dinosaur);
         this.soundPlayer = new SoundPlayer();
@@ -135,8 +137,6 @@ public class GamePanel extends JPanel implements Runnable {
 
         super.paintComponent(g);
 
-        
-
         background.draw(g, getWidth(), getHeight());
         floor.draw(g);
         dinosaur.draw(g);
@@ -146,8 +146,8 @@ public class GamePanel extends JPanel implements Runnable {
         }
 
         if (gameOver) {
-            g.setColor(Color.RED);
-            g.setFont(g.getFont().deriveFont(50.0f));
+            g.setColor(Color.RED); 
+            g.setFont(customFont);
             g.drawString("GAME OVER!", getWidth() / 2 - 150, getHeight() / 2);
         }
     }
