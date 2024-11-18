@@ -2,6 +2,7 @@ package game.main;
 
 import java.awt.*;
 
+import game.UI.GameOverScreen;
 import game.UI.Heart;
 import game.entities.Background;
 import game.entities.Dinosaur;
@@ -15,6 +16,7 @@ import game.manager.ScoreManager;
 import game.manager.SpeedManager;
 import game.utils.FontLoader;
 import game.utils.SoundPlayer;
+import game.utils.TextGenerator;
 
 import javax.swing.JPanel;
 
@@ -30,6 +32,8 @@ public class GamePanel extends JPanel implements Runnable {
     private CollissionManager collissionManager;
     private ObstacleManager obstacleManager;
 
+
+    @SuppressWarnings("unused")
     private Font customBoldFont;
     private Font customFont;
 
@@ -141,7 +145,12 @@ public class GamePanel extends JPanel implements Runnable {
             return;
         }
 
-        updateGameElements();
+        speedManager.update();
+        dinosaur.update();
+        scoreManager.update();
+        floor.update(deltaTime, speedManager.getCurrentSpeed());
+        obstacleManager.update(deltaTime, speedManager.getCurrentSpeed());
+
         handleCollisions();
     }
 
@@ -163,15 +172,6 @@ public class GamePanel extends JPanel implements Runnable {
         }
         return false; // Continúa con la actualización normal
     }
-
-    private void updateGameElements(){
-        speedManager.update();
-        dinosaur.update();
-        scoreManager.update();
-        floor.update(deltaTime, speedManager.getCurrentSpeed());
-        obstacleManager.update(deltaTime, speedManager.getCurrentSpeed());
-    }
-
 
     private void handleCollisions() {
         boolean collisionDetected = false;
@@ -228,34 +228,11 @@ public class GamePanel extends JPanel implements Runnable {
             obstacle.draw(g);
         }
 
-        g.setColor(Color.WHITE);
-        g.setFont(customFont);
-        g.drawString("Score: " + scoreManager.getScore(), 20, 20);
+        TextGenerator scoreText = new TextGenerator("Score: " + scoreManager.getScore(), 20, 20, customFont, Color.WHITE);
+        scoreText.draw(g);
 
         if (gameOver) {
-            g.setColor(Color.RED); 
-            g.setFont(customBoldFont);
-
-            FontMetrics metrics = g.getFontMetrics(customBoldFont);
-            String gameOver = "GAME OVER";
-            int gameOverX = (getWidth() - metrics.stringWidth(gameOver)) / 2;
-            int gameOverY = getHeight() / 2 - 20;
-            g.drawString(gameOver, gameOverX, gameOverY);
-
-           
-            g.setFont(customFont);
-            metrics = g.getFontMetrics(customFont);
-
-            String scoreText = "Your score is: " + scoreManager.getScore();
-            int scoreX = (getWidth() - metrics.stringWidth(scoreText)) / 2;
-            int scoreY = gameOverY + 30;
-            g.drawString(scoreText, scoreX, scoreY);
-            
-
-            String restartText = "Press enter to play again!";
-            int restartX = (getWidth() - metrics.stringWidth(restartText)) / 2;
-            int restartY = scoreY + 30;
-            g.drawString(restartText, restartX, restartY);
+            GameOverScreen.gameOverScreen(g, getWidth(), getHeight(), scoreManager.getScore());
         }
     }
 }
