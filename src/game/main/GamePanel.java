@@ -160,24 +160,34 @@ public class GamePanel extends JPanel implements Runnable {
         increaseSpeed();
         dinosaur.update();
         floor.update(deltaTime, currentSpeed);
+
+        boolean collisionDetected = false;
     
         for (int i = 0; i < obstacleList.size(); i++) {
             Obstacle obstacle = obstacleList.get(i);
             obstacle.update(deltaTime, currentSpeed);
-    
+
             if (dinosaur.geHitbox().intersects(obstacle.getHitbox())) {
-                if (dinosaur.getCurrentState() != Dinosaur.State.HIT) {
+                collisionDetected = true;
+    
+                if (!dinosaur.hasCollided()) { // Evitar múltiples activaciones
                     dinosaur.onCollision();
-                    hitStartTime = System.currentTimeMillis();
                     soundPlayer.setFile(2);
                     soundPlayer.play();
+                    hitStartTime = System.currentTimeMillis();
                 }
+                break; // Salir del bucle, ya que detectamos una colisión
             }
     
             if (obstacle.isOutOfScreen()) {
                 obstacleList.remove(i);
                 i--;
             }
+        }
+
+        if (!collisionDetected && dinosaur.hasCollided()) {
+            // Restablecer el estado del dinosaurio si ya no hay colisión
+            dinosaur.setCollided(false);
         }
     
         // Generar el puntaje

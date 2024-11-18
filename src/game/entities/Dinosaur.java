@@ -20,6 +20,7 @@ public class Dinosaur {
     private final int height;
     private int velocityY; 
     private boolean jumping; 
+    private boolean collided = false;
 
     private Hitbox hitbox;
     private State currentState;
@@ -93,7 +94,11 @@ public class Dinosaur {
     }
 
     public void onCollision() {
-        currentState = State.HIT;
+        this.currentState = State.HIT;
+        this.collided = true; 
+        this.jumping = false; 
+        this.velocityY = 0;
+        this.y = GROUND_Y;
     }
 
     public void draw(Graphics g) {
@@ -112,5 +117,13 @@ public class Dinosaur {
 
     public State getCurrentState(){
         return this.currentState;
+    }
+
+    public boolean hasCollided() {
+        return collided;
+    }
+    
+    public void setCollided(boolean collided) {
+        this.collided = collided;
     }
 }
