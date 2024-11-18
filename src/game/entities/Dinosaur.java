@@ -1,23 +1,31 @@
 package game.entities;
 import java.awt.*;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.imageio.ImageIO;
 
 import game.main.Animator;
 
-//The main character of the game, includes the position, speed, jump logic
 public class Dinosaur {
 
+    public enum State {
+        RUNNING, CROUCHING, HIT
+    }
+
     //Atributes
-    private int x, y, width, height;
+    private final int x;
+    private int y;
+    private final int width;
+    private final int height;
     private int velocityY; 
     private boolean jumping; 
 
-    private Animator animator;
-    private Image spriteSheet;
     private Hitbox hitbox;
+    private State currentState;
+    private Map<State, Animator> animations;
 
-    private static final int GROUND_Y = 300 - 138; //The position of the ground
+    private static final int GROUND_Y = 152; //The position of the ground
     private static final double GRAVITY = 1;
     private static final int JUMP_STRENGTH = -17;
 
@@ -25,20 +33,33 @@ public class Dinosaur {
     public Dinosaur() {
         this.x = 50; //Position of the dinosaur on the screen horizontally (fixed)
         this.y = GROUND_Y; // Position of the dinosaur on the screen vertically
-        this.width = 60; //Width of the dinosaur
-        this.height = 68; //Height of the dinosaur
+        this.width = 96; //Width of the dinosaur
+        this.height = 96; //Height of the dinosaur
         this.velocityY = 0; //Vertical speed
         this.jumping = false; //Check if dinosaur is in the air
+        this.currentState = State.RUNNING;
 
-        this.hitbox = new Hitbox(x + 5, y + 5, (int) (height * 0.8), (int) (width * 0.8));
+        this.animations = new HashMap<>();
+        this.hitbox = new Hitbox(x, y, (int) (height * 0.6), (int) (width * 0.5));
 
+        initializeAnimations();
+    }
+
+    public void initializeAnimations(){
         try {
-            spriteSheet = ImageIO.read(getClass().getResource("/resources/sprites/dinosaur-jump-sheet.png"));
-            animator = new Animator(spriteSheet, width, height, 6, 100, 0);
+            // Cargar y mapear animaciones
+            Image runningSheet = ImageIO.read(getClass().getResource("/resources/sprites/dinosaur-run-sheet.png"));
+            animations.put(State.RUNNING, new Animator(runningSheet, 32 * 3, 32 * 3, 6, 100, 0));
+
+            Image crouchingSheet = ImageIO.read(getClass().getResource("/resources/sprites/dinosaur-crouch-sheet.png"));
+            animations.put(State.CROUCHING, new Animator(crouchingSheet, 32 * 3, 32 * 3, 6, 100, 0));
+
+            Image hitSheet = ImageIO.read(getClass().getResource("/resources/sprites/dinosaur-hurt-sheet.png"));
+            animations.put(State.HIT, new Animator(hitSheet, 32 * 3, 32 * 3, 4, 150, 0));
+
         } catch (Exception e) {
             e.printStackTrace();
         }
-        
     }
 
     public void update() {
@@ -50,31 +71,46 @@ public class Dinosaur {
                 y = GROUND_Y;
                 jumping = false;
                 velocityY = 0;
+                currentState = State.RUNNING;
             }
         }
-        animator.update();
-        hitbox.update(x + 5, y + 5);
+
+        animations.get(currentState).update();
+        updateHitbox();
+    }
+
+    private void updateHitbox() {
+        int offsetX = 28;
+        int offsetY = 15;
+        hitbox.update(x + offsetX, y + offsetY);
     }
 
     public void jump() {
-        if (!jumping) {
+        if (!jumping && currentState != State.HIT) {
             jumping = true;           
             velocityY = JUMP_STRENGTH;
         }
     }
 
+    public void onCollision() {
+        currentState = State.HIT;
+    }
+
     public void draw(Graphics g) {
-        if (spriteSheet != null) {
-            animator.draw(g, x, y, width, height);
-           /*  hitbox.draw(g); */
-        }else{
+        try {
+            animations.get(currentState).draw(g, x, y, width, height);
+            /* hitbox.draw(g); */
+        } catch (Exception e) {
             g.setColor(Color.BLACK);         
             g.fillRect(x, y, width, height);
         }
-       
     }
 
     public Hitbox geHitbox(){
         return this.hitbox;
+    }
+
+    public State getCurrentState(){
+        return this.currentState;
     }
 }

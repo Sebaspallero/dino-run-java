@@ -26,14 +26,15 @@ public class KeyHandler implements KeyListener{
 
     @Override
     public void keyPressed(KeyEvent e) {
-        int code = e.getKeyCode();
-        if (code == KeyEvent.VK_SPACE) {
+        if (e.getKeyCode() == KeyEvent.VK_ENTER) {
             if (gamePanel.isGameOver()) {
                 gamePanel.resetGame();
-            }else{
+            }
+        } else if (e.getKeyCode() == KeyEvent.VK_SPACE) {
+            if (dinosaur.getCurrentState() != Dinosaur.State.HIT) {
                 dinosaur.jump();
                 soundPlayer.play();
-            }  
+            }
         }
     }
 

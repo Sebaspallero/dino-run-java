@@ -41,7 +41,7 @@ public class Obstacle {
     public void draw(Graphics g) {
         if (image != null) {
             g.drawImage(image, x, y, width, height, null);
-            /* hitbox.draw(g); */
+           /*  hitbox.draw(g); */
         }else{
             g.setColor(Color.BLUE);         
             g.fillRect(x, y, width, height); 
