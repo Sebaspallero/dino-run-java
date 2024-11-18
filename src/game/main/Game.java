@@ -2,7 +2,7 @@ package game.main;
 
 import javax.swing.JFrame;
 
-public class DinoGame extends JFrame{
+public class Game extends JFrame{
 
     public static final int SCREEN_WIDTH = 750;
     public static final int SCREEN_HEIGHT = 350;

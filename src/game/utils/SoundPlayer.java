@@ -1,4 +1,4 @@
-package game.sound;
+package game.utils;
 
 import java.io.IOException;
 import java.net.URL;

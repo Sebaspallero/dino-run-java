@@ -1,4 +1,4 @@
-package game.main;
+package game.utils;
 import java.awt.Font;
 import java.awt.FontFormatException;
 import java.io.IOException;

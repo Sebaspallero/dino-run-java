@@ -6,24 +6,21 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-import game.main.DinoGame;
+import game.main.Game;
 
 public class Floor {
 
     private int x, y, width, height;
-    private double speed;
     private int screen_width;
     private Image image;
 
 
     public Floor() {
-        this.screen_width = DinoGame.SCREEN_WIDTH;
-        this.width = 750*2;
-        this.height = 60*2;
+        this.screen_width = Game.SCREEN_WIDTH;
+        this.width = 750 * 2;
+        this.height = 60 * 2;
         this.x = 0;
-        this.y = DinoGame.SCREEN_HEIGHT - height;
-        this.speed = 5;
-       
+        this.y = Game.SCREEN_HEIGHT - height;
 
         try {
             image = ImageIO.read(getClass().getResource("/resources/sprites/floor-001.png"));
@@ -32,9 +29,8 @@ public class Floor {
         }
     }
 
-    public void update(double deltaTime, int newSpeed){
-        this.speed = newSpeed * deltaTime;;
-        x -= speed;
+    public void update(double deltaTime, int currentSpeed){
+        x -= deltaTime * currentSpeed * 1.5;
         if (x + width <= 0) {
             x = 0;
         }

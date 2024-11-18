@@ -5,7 +5,7 @@ import java.util.Map;
 
 import javax.imageio.ImageIO;
 
-import game.main.Animator;
+import game.utils.Animator;
 
 public class Dinosaur {
 
@@ -134,7 +134,7 @@ public class Dinosaur {
         }
     }
 
-    public Hitbox geHitbox(){
+    public Hitbox getHitbox(){
         return this.hitbox;
     }
 

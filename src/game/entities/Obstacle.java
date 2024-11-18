@@ -6,7 +6,6 @@ import javax.imageio.ImageIO;
 public class Obstacle {
 
     private int x, y, width, height;
-    private double speed;
     private Image image;
     private Hitbox hitbox;
 
@@ -18,7 +17,7 @@ public class Obstacle {
         this.y = GROUND_Y;
         this.width = width;
         this.height = height;
-        this.speed = 5;
+
         this.hitbox = new Hitbox(x, y, height - 20, width - 5);
 
         try {
@@ -28,9 +27,8 @@ public class Obstacle {
         }
     }
 
-    public void update(double deltaTime, int newSpeed) {
-        this.speed = newSpeed * deltaTime;
-        x -= speed;
+    public void update(double deltaTime, int currentSpeed) {
+        x -= deltaTime * currentSpeed;
         hitbox.update(x, y + 25);
     }
 
@@ -61,10 +59,6 @@ public class Obstacle {
     }
     public int getHeight() {
         return height;
-    }
-
-    public void setSpeed(int speed) {
-        this.speed = speed;
     }
 
     public Hitbox getHitbox(){

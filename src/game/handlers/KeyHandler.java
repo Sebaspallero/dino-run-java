@@ -1,10 +1,11 @@
-package game.main;
+package game.handlers;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 import game.entities.Dinosaur;
-import game.sound.SoundPlayer;
+import game.main.GamePanel;
+import game.utils.SoundPlayer;
 
 public class KeyHandler implements KeyListener{
 
