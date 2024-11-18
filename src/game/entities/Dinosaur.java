@@ -20,6 +20,7 @@ public class Dinosaur {
     private final int height;
     private int velocityY; 
     private boolean jumping; 
+    private boolean crouching;
     private boolean collided = false;
 
     private Hitbox hitbox;
@@ -37,7 +38,8 @@ public class Dinosaur {
         this.width = 96; //Width of the dinosaur
         this.height = 96; //Height of the dinosaur
         this.velocityY = 0; //Vertical speed
-        this.jumping = false; //Check if dinosaur is in the air
+        this.jumping = false;
+        this.crouching = false;
         this.currentState = State.RUNNING;
 
         this.animations = new HashMap<>();
@@ -76,13 +78,21 @@ public class Dinosaur {
             }
         }
 
+        if (crouching) {
+            currentState = State.CROUCHING;
+          
+        } else if (currentState != State.HIT) {
+            currentState = State.RUNNING;
+           
+        }
+
         animations.get(currentState).update();
         updateHitbox();
     }
 
     private void updateHitbox() {
         int offsetX = 28;
-        int offsetY = 15;
+        int offsetY = (currentState == State.CROUCHING) ? 30 : 15;
         hitbox.update(x + offsetX, y + offsetY);
     }
 
@@ -93,18 +103,31 @@ public class Dinosaur {
         }
     }
 
+    public void crouch(){
+        if (!crouching && currentState != State.HIT) {
+            crouching = true;
+        }
+    }
+
+    public void stand(){
+        if (crouching && currentState != State.HIT) {
+            crouching = false;
+        }
+    }
+
     public void onCollision() {
         this.currentState = State.HIT;
         this.collided = true; 
         this.jumping = false; 
         this.velocityY = 0;
         this.y = GROUND_Y;
+        this.crouching = false;
     }
 
     public void draw(Graphics g) {
         try {
             animations.get(currentState).draw(g, x, y, width, height);
-            /* hitbox.draw(g); */
+            hitbox.draw(g);
         } catch (Exception e) {
             g.setColor(Color.BLACK);         
             g.fillRect(x, y, width, height);

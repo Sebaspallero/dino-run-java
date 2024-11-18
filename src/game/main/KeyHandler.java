@@ -30,16 +30,29 @@ public class KeyHandler implements KeyListener{
             if (gamePanel.isGameOver()) {
                 gamePanel.resetGame();
             }
-        } else if (e.getKeyCode() == KeyEvent.VK_SPACE) {
+        }
+        
+        if (e.getKeyCode() == KeyEvent.VK_SPACE) {
             if (dinosaur.getCurrentState() != Dinosaur.State.HIT) {
                 dinosaur.jump();
                 soundPlayer.play();
+            }
+        }
+
+        if (e.getKeyCode() == KeyEvent.VK_DOWN) {
+            if (dinosaur.getCurrentState() != Dinosaur.State.HIT) {
+                dinosaur.crouch();
             }
         }
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
+        if (e.getKeyCode() == KeyEvent.VK_DOWN) {
+            if (dinosaur.getCurrentState() != Dinosaur.State.HIT) {
+                dinosaur.stand();
+            }
+        }
     }
 
     public void setDinosaur(Dinosaur dinosaur) {
