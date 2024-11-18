@@ -5,18 +5,21 @@ import javax.imageio.ImageIO;
 
 public class Obstacle {
 
-    private int x, y, width, height, speed;
+    private int x, y, width, height;
+    private double speed;
     private Image image;
+    private Hitbox hitbox;
 
     private static final int GROUND_Y = 300 - 118;
     private static final int SPAWN_X = 800;
 
-    public Obstacle(int width, int height, int speed) {
+    public Obstacle(int width, int height) {
         this.x = SPAWN_X;
         this.y = GROUND_Y;
         this.width = width;
         this.height = height;
-        this.speed = speed;
+        this.speed = 5;
+        this.hitbox = new Hitbox(x, y, height - 20, width - 5);
 
         try {
             image = ImageIO.read(getClass().getResource("/resources/sprites/spikes-001.png"));
@@ -25,8 +28,10 @@ public class Obstacle {
         }
     }
 
-    public void update() {
+    public void update(double deltaTime, int newSpeed) {
+        this.speed = newSpeed * deltaTime;
         x -= speed;
+        hitbox.update(x, y + 25);
     }
 
     public boolean isOutOfScreen(){
@@ -36,6 +41,7 @@ public class Obstacle {
     public void draw(Graphics g) {
         if (image != null) {
             g.drawImage(image, x, y, width, height, null);
+           /*  hitbox.draw(g); */
         }else{
             g.setColor(Color.BLUE);         
             g.fillRect(x, y, width, height); 
@@ -46,50 +52,23 @@ public class Obstacle {
         return x;
     }
 
-    public void setX(int x) {
-        this.x = x;
-    }
-
     public int getY() {
         return y;
-    }
-
-    public void setY(int y) {
-        this.y = y;
     }
 
     public int getWidth() {
         return width;
     }
-
-    public void setWidth(int width) {
-        this.width = width;
-    }
-
     public int getHeight() {
         return height;
-    }
-
-    public void setHeight(int height) {
-        this.height = height;
-    }
-
-    public int getSpeed() {
-        return speed;
     }
 
     public void setSpeed(int speed) {
         this.speed = speed;
     }
 
-    public static int getGroundY() {
-        return GROUND_Y;
+    public Hitbox getHitbox(){
+        return this.hitbox;
     }
-
-    public static int getSpawnX() {
-        return SPAWN_X;
-    }
-    
-    
     
 }

@@ -10,9 +10,11 @@ public class KeyHandler implements KeyListener{
 
     private Dinosaur dinosaur;
     private SoundPlayer soundPlayer;
+    private GamePanel gamePanel;
 
-    public KeyHandler(Dinosaur dinosaur){
+    public KeyHandler(Dinosaur dinosaur, GamePanel gamePanel){
         this.dinosaur = dinosaur;
+        this.gamePanel = gamePanel;
         this.soundPlayer = new SoundPlayer();
         soundPlayer.setFile(0);
     }
@@ -24,15 +26,24 @@ public class KeyHandler implements KeyListener{
 
     @Override
     public void keyPressed(KeyEvent e) {
-        int code = e.getKeyCode();
-        if (code == KeyEvent.VK_SPACE) {
-            dinosaur.jump();
-            soundPlayer.play();
+        if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+            if (gamePanel.isGameOver()) {
+                gamePanel.resetGame();
+            }
+        } else if (e.getKeyCode() == KeyEvent.VK_SPACE) {
+            if (dinosaur.getCurrentState() != Dinosaur.State.HIT) {
+                dinosaur.jump();
+                soundPlayer.play();
+            }
         }
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
+    }
+
+    public void setDinosaur(Dinosaur dinosaur) {
+        this.dinosaur = dinosaur;
     }
 
 }

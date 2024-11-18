@@ -19,7 +19,16 @@ public class GamePanel extends JPanel implements Runnable {
     private List<Obstacle> obstacleList;
     private Floor floor;
     private Background background;
-    
+
+    private Font customBoldFont;
+    private Font customFont;
+
+    private int score;
+    private int scoreTimer;
+    private final int SCORE_DELAY = 7;
+
+    private long hitStartTime;
+    private final long HIT_DURATION = 1000;
 
     private boolean running;
     private boolean gameOver;
@@ -27,37 +36,82 @@ public class GamePanel extends JPanel implements Runnable {
     private KeyHandler keyHandler;
     private SoundPlayer soundPlayer;
 
-    private int currentSpeed = 5; // Velocidad inicial de los obstáculos
+    private int currentSpeed = 300; // Velocidad inicial de los obstáculos
     private long lastObstacleTime = System.currentTimeMillis();
     private long obstacleInterval = 2000; // Tiempo entre obstáculos (en ms)
     private long lastSpeedIncreaseTime = System.currentTimeMillis();
     private long speedIncreaseInterval = 10000; // Incrementar velocidad cada 10 segundos
 
-
-    public static final int GROUND_HEIGHT = 50;
+    private double deltaTime;  // Variable para almacenar el deltaTime
+    private long lastTime;
 
     public GamePanel() {
-        this.running = true;
+        this.running = false;
 
         this.dinosaur = new Dinosaur();
         this.obstacleList = new ArrayList<>();
-        this.floor = new Floor(currentSpeed);
+        this.floor = new Floor();
         this.background = new Background();
+        this.score = 0;
+        this.scoreTimer = 0;
+        
+        customFont = FontLoader.loadFont("/resources/font/PixelOperator8.ttf", 16f);
+        customBoldFont = FontLoader.loadFont("/resources/font/PixelOperator8-Bold.ttf", 24f);
 
-        this.keyHandler = new KeyHandler(dinosaur);
+        this.keyHandler = new KeyHandler(dinosaur,this);
         this.soundPlayer = new SoundPlayer();
+
         this.gameOver = false;
 
         addKeyListener(keyHandler);
         setFocusable(true);
-        soundPlayer.setFile(1);
 
+        this.lastTime = System.nanoTime();
+        
     }
 
     public void startGame() {
+        if (!running) {
+            this.running = true;
+            new Thread(this).start();
+    
+            soundPlayer.setFile(1);
+            soundPlayer.play();
+        }
+    }
+
+    public void resetGame(){
+        this.running = false;
+
+        try {
+            Thread.sleep(100);  // Dar tiempo para detener el hilo correctamente
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        this.gameOver = false;
+        this.currentSpeed = 300;  // Reinicia la velocidad
+        this.lastObstacleTime = System.currentTimeMillis();
+        this.lastSpeedIncreaseTime = System.currentTimeMillis();
+        this.obstacleList.clear();  // Limpia los obstáculos existentes
+        this.obstacleInterval = 2000;
+
+        this.dinosaur = new Dinosaur();  // Reinicia el dinosaurio
+        this.floor = new Floor();  // Reinicia el suelo
+        this.background = new Background();  // Reinicia el fondo
+        this.score = 0;
+        this.scoreTimer = 0;
+
+        this.keyHandler.setDinosaur(this.dinosaur);
+
+        this.lastTime = System.nanoTime();  // Reiniciar el cálculo de deltaTime
+        this.hitStartTime = 0;  // Reinicia el tiempo de colisión
+
+        
+        // Luego de reiniciar, se puede volver a ejecutar el juego:
         this.running = true;
-        new Thread(this).start();
-        soundPlayer.play();
+        new Thread(this).start();  // Iniciar un nuevo hilo de ejecución
+        repaint();
     }
 
     @Override
@@ -74,34 +128,77 @@ public class GamePanel extends JPanel implements Runnable {
     }
 
     private void updateGame() {
-        if (gameOver) {
-            return; // Si el juego está terminado, no actualizamos más
+        if (!running) {
+            return;
         }
-
+    
+        if (gameOver) {
+            // Solo actualizamos la pantalla de Game Over, pero no hacemos más lógica de juego
+            return;
+        }
+    
+        // Calcular deltaTime
+        long now = System.nanoTime();
+        deltaTime = (now - lastTime) / 1000000000.0; // Convertir a segundos
+        lastTime = now;
+    
+        // Si el dinosaurio está en estado HIT
+        if (dinosaur.getCurrentState() == Dinosaur.State.HIT) {
+            dinosaur.update(); // Asegurarse de que la animación de HIT se actualice
+            long elapsedTime = System.currentTimeMillis() - hitStartTime;
+    
+            if (elapsedTime >= HIT_DURATION) { // Pasar a gameOver después de la animación
+                gameOver = true;
+                // Mantenemos el juego en estado "gameOver", pero no detenemos el juego
+                // No cambiamos running = false aquí
+            }
+    
+            return; // No actualizamos más elementos
+        }
+    
+        // Actualizar elementos del juego si no estamos en HIT
+        increaseSpeed();
         dinosaur.update();
-        floor.update();
-        /* background.update(currentSpeed); */
+        floor.update(deltaTime, currentSpeed);
 
+        boolean collisionDetected = false;
+    
         for (int i = 0; i < obstacleList.size(); i++) {
             Obstacle obstacle = obstacleList.get(i);
-            obstacle.update();
+            obstacle.update(deltaTime, currentSpeed);
 
-            if (dinosaur.checkCollision(obstacle)) {
-                gameOver = true; // Terminar el juego en caso de colisión
+            if (dinosaur.geHitbox().intersects(obstacle.getHitbox())) {
+                collisionDetected = true;
+    
+                if (!dinosaur.hasCollided()) { // Evitar múltiples activaciones
+                    dinosaur.onCollision();
+                    soundPlayer.setFile(2);
+                    soundPlayer.play();
+                    hitStartTime = System.currentTimeMillis();
+                }
+                break; // Salir del bucle, ya que detectamos una colisión
             }
-
-            // Eliminar obstáculos fuera de pantalla
+    
             if (obstacle.isOutOfScreen()) {
                 obstacleList.remove(i);
                 i--;
             }
         }
 
+        if (!collisionDetected && dinosaur.hasCollided()) {
+            // Restablecer el estado del dinosaurio si ya no hay colisión
+            dinosaur.setCollided(false);
+        }
+    
+        // Generar el puntaje
+        scoreTimer++;
+        if (scoreTimer >= SCORE_DELAY) {
+            score++;
+            scoreTimer = 0;
+        }
+    
         // Generar nuevos obstáculos
         generateObstacles();
-
-        // Incrementar velocidad con el tiempo
-        increaseSpeed();
     }
 
     private void generateObstacles() {
@@ -109,10 +206,10 @@ public class GamePanel extends JPanel implements Runnable {
 
         // Generar un nuevo obstáculo si ha pasado suficiente tiempo
         if (currentTime - lastObstacleTime >= obstacleInterval) {
-            int width = 48;//random.nextInt(30) + 20; // Ancho entre 20 y 50 px
-            int height = 48;//random.nextInt(40) + 30; // Alto entre 30 y 70 px
+            int width = 48;
+            int height = 48;
 
-            obstacleList.add(new Obstacle(width, height, currentSpeed));
+            obstacleList.add(new Obstacle(width, height));
             lastObstacleTime = currentTime;
         }
     }
@@ -122,7 +219,7 @@ public class GamePanel extends JPanel implements Runnable {
 
         // Incrementar la velocidad cada `speedIncreaseInterval`
         if (currentTime - lastSpeedIncreaseTime >= speedIncreaseInterval) {
-            currentSpeed++;
+            currentSpeed += 50;
             lastSpeedIncreaseTime = currentTime;
 
             // Opcional: reduce el tiempo entre obstáculos para aumentar dificultad
@@ -135,8 +232,6 @@ public class GamePanel extends JPanel implements Runnable {
 
         super.paintComponent(g);
 
-        
-
         background.draw(g, getWidth(), getHeight());
         floor.draw(g);
         dinosaur.draw(g);
@@ -145,11 +240,38 @@ public class GamePanel extends JPanel implements Runnable {
             obstacle.draw(g);
         }
 
+        g.setColor(Color.WHITE);
+        g.setFont(customFont);
+        g.drawString("Score: " + score, 20, 20);
+
         if (gameOver) {
-            g.setColor(Color.RED);
-            g.setFont(g.getFont().deriveFont(50.0f));
-            g.drawString("GAME OVER!", getWidth() / 2 - 150, getHeight() / 2);
+            g.setColor(Color.RED); 
+            g.setFont(customBoldFont);
+
+            FontMetrics metrics = g.getFontMetrics(customBoldFont);
+            String gameOver = "GAME OVER";
+            int gameOverX = (getWidth() - metrics.stringWidth(gameOver)) / 2;
+            int gameOverY = getHeight() / 2 - 20;
+            g.drawString(gameOver, gameOverX, gameOverY);
+
+           
+            g.setFont(customFont);
+            metrics = g.getFontMetrics(customFont);
+
+            String scoreText = "Your score is: " + score;
+            int scoreX = (getWidth() - metrics.stringWidth(scoreText)) / 2;
+            int scoreY = gameOverY + 30;
+            g.drawString(scoreText, scoreX, scoreY);
+            
+
+            String restartText = "Press enter to play again!";
+            int restartX = (getWidth() - metrics.stringWidth(restartText)) / 2;
+            int restartY = scoreY + 30;
+            g.drawString(restartText, restartX, restartY);
         }
     }
 
+    public boolean isGameOver() {
+        return gameOver;
+    }
 }

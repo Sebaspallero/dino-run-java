@@ -6,30 +6,20 @@ import javax.imageio.ImageIO;
 
 public class Background {
 
-    private Image image;   // Imagen pequeña del fondo
-    private int imageWidth; // Ancho de la imagen
-    private int imageHeight; // Alto de la imagen
-    private int offsetX; // Desplazamiento acumulado horizontal
+    private Image image;   
+    private int imageWidth; 
+    private int imageHeight; 
+    private int offsetX; 
 
     public Background() {
         this.offsetX = 0;
 
         try {
             image = ImageIO.read(getClass().getResource("/resources/sprites/background-001.png"));
-            imageWidth = image.getWidth(null); // Obtener ancho de la imagen
-            imageHeight = image.getHeight(null); // Obtener alto de la imagen
+            imageWidth = image.getWidth(null); 
+            imageHeight = image.getHeight(null); 
         } catch (IOException e) {
             e.printStackTrace();
-        }
-    }
-
-    // Actualizar el desplazamiento del fondo
-    public void update(int speed) {
-        offsetX -= speed; // Mover hacia la izquierda
-
-        // Si el desplazamiento supera el ancho de la imagen, reinícialo
-        if (offsetX <= -imageWidth) {
-            offsetX += imageWidth;
         }
     }
 
