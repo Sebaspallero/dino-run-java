@@ -30,7 +30,7 @@ public class Floor {
     }
 
     public void update(double deltaTime, int currentSpeed){
-        x -= deltaTime * currentSpeed * 1.5;
+        x -= deltaTime * currentSpeed;
         if (x + width <= 0) {
             x = 0;
         }

@@ -33,7 +33,7 @@ public class Obstacle {
     }
 
     public boolean isOutOfScreen(){
-       return x + width < 0;
+       return x + width < -15;
     }
 
     public void draw(Graphics g) {

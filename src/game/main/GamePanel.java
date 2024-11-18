@@ -42,11 +42,8 @@ public class GamePanel extends JPanel implements Runnable {
     private KeyHandler keyHandler;
     private SoundPlayer soundPlayer;
 
-    private int initialSpeed = 200;
+    private int initialSpeed = 250;
     private long speedIncreaseInterval = 15000; //Every 10 seconds increase the speed
-
-    private long initialObstacleInterval = 2000; //New obstacle every 2 seconds
-    private long obstacleIncreaseInterval = 10000;
     
     private double deltaTime; 
     private long lastTime;
@@ -62,7 +59,7 @@ public class GamePanel extends JPanel implements Runnable {
         this.livesManager = new LivesManager();
         this.speedManager = new SpeedManager(initialSpeed, speedIncreaseInterval);
         this.collissionManager = new CollissionManager();
-        this.obstacleManager = new ObstacleManager(initialObstacleInterval, obstacleIncreaseInterval);
+        this.obstacleManager = new ObstacleManager();
         
         this.customFont = FontLoader.loadFont("/resources/font/PixelOperator8.ttf", 16f);
         this.customBoldFont = FontLoader.loadFont("/resources/font/PixelOperator8-Bold.ttf", 24f);
@@ -100,9 +97,8 @@ public class GamePanel extends JPanel implements Runnable {
 
         this.gameOver = false;
         
-        this.obstacleManager.resetObstacles(); 
-        this.initialObstacleInterval = 2000;
-        this.speedManager.resetSpeed();
+        this.obstacleManager.resetObstacles();
+        this.speedManager.resetSpeed(initialSpeed);
         this.scoreManager.resetScore();
         this.livesManager.resetHearts();
         this.dinosaur = new Dinosaur();  
@@ -147,7 +143,6 @@ public class GamePanel extends JPanel implements Runnable {
 
         updateGameElements();
         handleCollisions();
-        generateObstacles();
     }
 
     private void getDeltaTime(){
@@ -177,13 +172,13 @@ public class GamePanel extends JPanel implements Runnable {
         obstacleManager.update(deltaTime, speedManager.getCurrentSpeed());
     }
 
+
     private void handleCollisions() {
         boolean collisionDetected = false;
     
         for (int i = 0; i < obstacleManager.getObstacleList().size(); i++) {
             Obstacle obstacle = obstacleManager.getObstacleList().get(i);
-            obstacle.update(deltaTime, speedManager.getCurrentSpeed());
-    
+
             if (collissionManager.checkCollision(dinosaur, obstacleManager.getObstacleList())) {
                 collisionDetected = true;
     
@@ -210,10 +205,6 @@ public class GamePanel extends JPanel implements Runnable {
         soundPlayer.play();
         hitStartTime = System.currentTimeMillis();
         livesManager.updateHeart(dinosaur);
-    }
-
-    private void generateObstacles() {
-        obstacleManager.update(deltaTime, speedManager.getCurrentSpeed());
     }
     
     public boolean isGameOver() {
