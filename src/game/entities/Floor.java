@@ -20,7 +20,7 @@ public class Floor {
         this.width = 750 * 2;
         this.height = 60 * 2;
         this.x = 0;
-        this.y = Game.SCREEN_HEIGHT - height;
+        this.y = Game.SCREEN_HEIGHT - 120;
 
         try {
             image = ImageIO.read(getClass().getResource("/resources/sprites/floor-001.png"));

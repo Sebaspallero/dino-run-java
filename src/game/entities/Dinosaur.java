@@ -9,37 +9,47 @@ import game.utils.Animator;
 
 public class Dinosaur {
 
+    //Character States
     public enum State {
-        RUNNING, CROUCHING, HIT
+        RUNNING, 
+        CROUCHING, 
+        HIT,
+        JUMPING,
+        FALLING
     }
 
-    //Atributes
-    private final int x;
+    //Constants
+    private static final int GROUND_Y = 170; // The position of the character on the ground
+    private static final double GRAVITY = 1;
+    private static final int JUMP_STRENGTH = -17; //How high is the jump
+    private static final int HITBOX_OFFSET_X = 28;
+
+
+    //Attributes
+    private int x;
     private int y;
-    private final int width;
-    private final int height;
+    private int width;
+    private int height;
+
     private int velocityY; 
     private boolean jumping; 
     private boolean crouching;
-    private boolean collided = false;
+    private boolean collided;
 
-    private Hitbox hitbox;
     private State currentState;
+    private Hitbox hitbox;
     private Map<State, Animator> animations;
-
-    private static final int GROUND_Y = 152; //The position of the ground
-    private static final double GRAVITY = 1;
-    private static final int JUMP_STRENGTH = -17;
 
     //Constructor
     public Dinosaur() {
         this.x = 50; //Position of the dinosaur on the screen horizontally (fixed)
-        this.y = GROUND_Y; // Position of the dinosaur on the screen vertically
-        this.width = 96; //Width of the dinosaur
-        this.height = 96; //Height of the dinosaur
+        this.y = GROUND_Y; // Initial Position of the dinosaur on the screen vertically
+        this.width = 64; //Width of the dinosaur
+        this.height = 64; //Height of the dinosaur
         this.velocityY = 0; //Vertical speed
         this.jumping = false;
         this.crouching = false;
+        this.collided = false;
         this.currentState = State.RUNNING;
 
         this.animations = new HashMap<>();
@@ -48,52 +58,64 @@ public class Dinosaur {
         initializeAnimations();
     }
 
+     //Load animations for each state
     public void initializeAnimations(){
         try {
-            // Cargar y mapear animaciones
-            Image runningSheet = ImageIO.read(getClass().getResource("/resources/sprites/dinosaur-run-sheet.png"));
-            animations.put(State.RUNNING, new Animator(runningSheet, 32 * 3, 32 * 3, 6, 100, 0));
-
-            Image crouchingSheet = ImageIO.read(getClass().getResource("/resources/sprites/dinosaur-crouch-sheet.png"));
-            animations.put(State.CROUCHING, new Animator(crouchingSheet, 32 * 3, 32 * 3, 6, 100, 0));
-
-            Image hitSheet = ImageIO.read(getClass().getResource("/resources/sprites/dinosaur-hurt-sheet.png"));
-            animations.put(State.HIT, new Animator(hitSheet, 32 * 3, 32 * 3, 4, 150, 0));
+            animations.put(State.RUNNING, createAnimator("/resources/sprites/frog-run.png", 2, 12));
+            animations.put(State.HIT, createAnimator("/resources/sprites/frog-hit.png", 2, 7));
+            animations.put(State.JUMPING, createAnimator("/resources/sprites/frog-jump.png", 2, 1));
+            animations.put(State.FALLING, createAnimator("/resources/sprites/frog-fall.png", 2, 1));
+            animations.put(State.CROUCHING, createAnimator("/resources/sprites/dinosaur-crouch-sheet.png", 2, 6));
 
         } catch (Exception e) {
             e.printStackTrace();
-        }
+        } 
+    }
+
+    public Animator createAnimator(String path, int scaleFactor, int frameCount) throws Exception{
+        Image spriteSheet = ImageIO.read(getClass().getResource(path));
+        return new Animator(spriteSheet, 32 * scaleFactor, 32 * scaleFactor, frameCount, 90,0);
     }
 
     public void update() {
         if (jumping) {
-            velocityY += GRAVITY;
-            y += velocityY;
-
-            if (y >= GROUND_Y) {
-                y = GROUND_Y;
-                jumping = false;
-                velocityY = 0;
-                currentState = State.RUNNING;
-            }
-        }
-
-        if (crouching) {
+            handleJump();
+        } else if (crouching) {
             currentState = State.CROUCHING;
-          
         } else if (currentState != State.HIT) {
             currentState = State.RUNNING;
-           
         }
 
         animations.get(currentState).update();
         updateHitbox();
     }
 
+    private void handleJump() {
+        velocityY += GRAVITY;
+        y += velocityY;
+
+        if (velocityY < 0) {
+            currentState = State.JUMPING;
+        } else if (velocityY > 0) {
+            currentState = State.FALLING;
+        }
+
+        if (y >= GROUND_Y) {
+            resetToGround();
+        }
+    }
+
+    private void resetToGround() {
+        y = GROUND_Y;
+        jumping = false;
+        velocityY = 0;
+        currentState = State.RUNNING;
+    }
+
+    //Character Hitbox
     private void updateHitbox() {
-        int offsetX = 28;
         int offsetY = (currentState == State.CROUCHING) ? 30 : 15;
-        hitbox.update(x + offsetX, y + offsetY);
+        hitbox.update(x + HITBOX_OFFSET_X, y + offsetY);
     }
 
     public void jump() {
@@ -127,7 +149,7 @@ public class Dinosaur {
     public void draw(Graphics g) {
         try {
             animations.get(currentState).draw(g, x, y, width, height);
-            hitbox.draw(g);
+            /* hitbox.draw(g); */
         } catch (Exception e) {
             g.setColor(Color.BLACK);         
             g.fillRect(x, y, width, height);
