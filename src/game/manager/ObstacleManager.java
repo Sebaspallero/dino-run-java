@@ -55,7 +55,7 @@ public class ObstacleManager {
         // Si ha pasado el tiempo de intervalo para aumentar la dificultad
         if (currentTime - lastDifficultyIncreaseTime >= obstacleIncreaseInterval) {
             // Reducir el intervalo de generación de obstáculos para aumentar la dificultad
-            obstacleInterval = Math.max(obstacleInterval - 250, 700); // Limitar el intervalo a un mínimo de 700 ms
+            obstacleInterval = Math.max(obstacleInterval - 250, 550); // Limitar el intervalo a un mínimo de 700 ms
             lastDifficultyIncreaseTime = currentTime;  // Reiniciar el temporizador de aumento de dificultad
         }
     }

@@ -9,7 +9,7 @@ import game.entities.Dinosaur;
 import game.entities.Floor;
 import game.entities.Obstacle;
 import game.handlers.KeyHandler;
-import game.manager.CollissionManager;
+import game.manager.CollisionManager;
 import game.manager.LivesManager;
 import game.manager.ObstacleManager;
 import game.manager.ScoreManager;
@@ -29,16 +29,13 @@ public class GamePanel extends JPanel implements Runnable {
     private LivesManager livesManager;
     private ScoreManager scoreManager;
     private SpeedManager speedManager;
-    private CollissionManager collissionManager;
+    private CollisionManager collissionManager;
     private ObstacleManager obstacleManager;
 
 
     @SuppressWarnings("unused")
     private Font customBoldFont;
     private Font customFont;
-
-    private long hitStartTime;
-    private final long HIT_DURATION = 1000;
 
     private boolean running;
     private boolean gameOver;
@@ -62,7 +59,7 @@ public class GamePanel extends JPanel implements Runnable {
         this.scoreManager = new ScoreManager();
         this.livesManager = new LivesManager();
         this.speedManager = new SpeedManager(initialSpeed, speedIncreaseInterval);
-        this.collissionManager = new CollissionManager();
+        this.collissionManager = new CollisionManager(new SoundPlayer(), livesManager);
         this.obstacleManager = new ObstacleManager();
         
         this.customFont = FontLoader.loadFont("/resources/font/PixelOperator8.ttf", 16f);
@@ -110,9 +107,8 @@ public class GamePanel extends JPanel implements Runnable {
         this.background = new Background(); 
         
         this.keyHandler.setDinosaur(this.dinosaur);
-
-        this.lastTime = System.nanoTime();  
-        this.hitStartTime = 0;
+        this.collissionManager.setHitStartTime(0);
+        this.lastTime = System.nanoTime();
 
         this.running = true;
         new Thread(this).start();
@@ -139,10 +135,13 @@ public class GamePanel extends JPanel implements Runnable {
     
         //Calculate Delta Time
         getDeltaTime();
-        
-        //Check state of dinosaur
-        if (isDinosaurHit()) {
-            return;
+
+        if (dinosaur.getCurrentState() == Dinosaur.State.HIT) {
+            dinosaur.update(); // Actualiza la animación de HIT
+            if (collissionManager.isDinosaurHit(dinosaur)) {
+                gameOver = true;
+            }
+            return; // Salimos del ciclo de actualización, pero dejamos que la animación se ejecute
         }
 
         speedManager.update();
@@ -151,60 +150,13 @@ public class GamePanel extends JPanel implements Runnable {
         floor.update(deltaTime, speedManager.getCurrentSpeed());
         obstacleManager.update(deltaTime, speedManager.getCurrentSpeed());
 
-        handleCollisions();
+        collissionManager.handleCollisions(dinosaur, obstacleManager.getObstacleList());
     }
 
     private void getDeltaTime(){
         long now = System.nanoTime();
         deltaTime = (now - lastTime) / 1000000000.0;
         lastTime = now;
-    }
-
-    private boolean isDinosaurHit(){
-        if (dinosaur.getCurrentState() == Dinosaur.State.HIT) {
-            dinosaur.update(); // Actualiza animación de HIT
-            long elapsedTime = System.currentTimeMillis() - hitStartTime;
-    
-            if (elapsedTime >= HIT_DURATION) {
-                gameOver = true;
-            }
-            return true; // Indica que el dinosaurio está en estado HIT
-        }
-        return false; // Continúa con la actualización normal
-    }
-
-    private void handleCollisions() {
-        boolean collisionDetected = false;
-    
-        for (int i = 0; i < obstacleManager.getObstacleList().size(); i++) {
-            Obstacle obstacle = obstacleManager.getObstacleList().get(i);
-
-            if (collissionManager.checkCollision(dinosaur, obstacleManager.getObstacleList())) {
-                collisionDetected = true;
-    
-                if (!dinosaur.hasCollided()) {
-                    handleDinosaurCollision();
-                }
-                break; // Salimos del bucle si detectamos una colisión
-            }
-    
-            if (obstacle.isOutOfScreen()) {
-                obstacleManager.getObstacleList().remove(i);
-                i--;
-            }
-        }
-    
-        if (!collisionDetected && dinosaur.hasCollided()) {
-            dinosaur.setCollided(false); // Restablece el estado del dinosaurio
-        }
-    }
-
-    private void handleDinosaurCollision() {
-        dinosaur.onCollision();
-        soundPlayer.setFile(2);
-        soundPlayer.play();
-        hitStartTime = System.currentTimeMillis();
-        livesManager.updateHeart(dinosaur);
     }
     
     public boolean isGameOver() {
