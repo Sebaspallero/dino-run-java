@@ -1,10 +1,11 @@
-package game.entities;
+package game.entities.character;
 import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.imageio.ImageIO;
 
+import game.entities.Hitbox;
 import game.utils.Animator;
 
 public class Dinosaur {
@@ -22,7 +23,7 @@ public class Dinosaur {
     private static final int GROUND_Y = 170; // The position of the character on the ground
     private static final double GRAVITY = 1;
     private static final int JUMP_STRENGTH = -17; //How high is the jump
-    private static final int HITBOX_OFFSET_X = 28;
+    private static final int HITBOX_OFFSET_X = 15;
 
 
     //Attributes
@@ -42,11 +43,11 @@ public class Dinosaur {
 
     //Constructor
     public Dinosaur() {
-        this.x = 50; //Position of the dinosaur on the screen horizontally (fixed)
-        this.y = GROUND_Y; // Initial Position of the dinosaur on the screen vertically
-        this.width = 64; //Width of the dinosaur
-        this.height = 64; //Height of the dinosaur
-        this.velocityY = 0; //Vertical speed
+        this.x = 50;
+        this.y = GROUND_Y;
+        this.width = 64;
+        this.height = 64; 
+        this.velocityY = 0; 
         this.jumping = false;
         this.crouching = false;
         this.collided = false;
@@ -58,25 +59,26 @@ public class Dinosaur {
         initializeAnimations();
     }
 
-     //Load animations for each state
+    //Load animations for each state
     public void initializeAnimations(){
         try {
-            animations.put(State.RUNNING, createAnimator("/resources/sprites/frog-run.png", 2, 12));
-            animations.put(State.HIT, createAnimator("/resources/sprites/frog-hit.png", 2, 7));
-            animations.put(State.JUMPING, createAnimator("/resources/sprites/frog-jump.png", 2, 1));
-            animations.put(State.FALLING, createAnimator("/resources/sprites/frog-fall.png", 2, 1));
-            animations.put(State.CROUCHING, createAnimator("/resources/sprites/dinosaur-crouch-sheet.png", 2, 6));
+            animations.put(State.RUNNING, createAnimator("/resources/sprites/frog-run.png", 2, 12,90));
+            animations.put(State.HIT, createAnimator("/resources/sprites/frog-hit.png", 2, 7,70));
+            animations.put(State.JUMPING, createAnimator("/resources/sprites/frog-jump.png", 2, 1,90));
+            animations.put(State.FALLING, createAnimator("/resources/sprites/frog-fall.png", 2, 1,90));
+            animations.put(State.CROUCHING, createAnimator("/resources/sprites/dinosaur-crouch-sheet.png", 2, 6,100));
 
         } catch (Exception e) {
             e.printStackTrace();
         } 
     }
 
-    public Animator createAnimator(String path, int scaleFactor, int frameCount) throws Exception{
+    public Animator createAnimator(String path, int scaleFactor, int frameCount, int frameDelay) throws Exception{
         Image spriteSheet = ImageIO.read(getClass().getResource(path));
-        return new Animator(spriteSheet, 32 * scaleFactor, 32 * scaleFactor, frameCount, 90,0);
+        return new Animator(spriteSheet, 32 * scaleFactor, 32 * scaleFactor, frameCount, frameDelay,0);
     }
 
+    //Update States of the character
     public void update() {
         if (jumping) {
             handleJump();
@@ -118,6 +120,7 @@ public class Dinosaur {
         hitbox.update(x + HITBOX_OFFSET_X, y + offsetY);
     }
 
+    //Actions
     public void jump() {
         if (!jumping && currentState != State.HIT) {
             jumping = true;           
@@ -146,16 +149,18 @@ public class Dinosaur {
         this.crouching = false;
     }
 
+    //Draw the character
     public void draw(Graphics g) {
         try {
             animations.get(currentState).draw(g, x, y, width, height);
-            /* hitbox.draw(g); */
+            /* hitbox.draw(g); */ //Show hitbox
         } catch (Exception e) {
             g.setColor(Color.BLACK);         
             g.fillRect(x, y, width, height);
         }
     }
 
+    //Getters and Setters
     public Hitbox getHitbox(){
         return this.hitbox;
     }

@@ -3,7 +3,8 @@ package game.manager;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import game.entities.Obstacle;
+
+import game.entities.obstacles.Obstacle;
 
 public class ObstacleManager {
 

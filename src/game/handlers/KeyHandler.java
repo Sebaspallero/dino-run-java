@@ -3,7 +3,7 @@ package game.handlers;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
-import game.entities.Dinosaur;
+import game.entities.character.Dinosaur;
 import game.main.GamePanel;
 import game.utils.SoundPlayer;
 

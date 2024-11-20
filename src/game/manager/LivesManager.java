@@ -1,7 +1,7 @@
 package game.manager;
 
 import game.UI.Heart;
-import game.entities.Dinosaur;
+import game.entities.character.Dinosaur;
 
 public class LivesManager {
 

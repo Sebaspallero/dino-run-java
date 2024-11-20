@@ -2,8 +2,8 @@ package game.manager;
 
 import java.util.List;
 
-import game.entities.Dinosaur;
-import game.entities.Obstacle;
+import game.entities.character.Dinosaur;
+import game.entities.obstacles.Obstacle;
 import game.utils.SoundPlayer;
 
 public class CollisionManager {

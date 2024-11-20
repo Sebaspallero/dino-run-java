@@ -1,7 +1,9 @@
-package game.entities;
+package game.entities.obstacles;
 import java.awt.*;
 import java.io.IOException;
 import javax.imageio.ImageIO;
+
+import game.entities.Hitbox;
 
 public class Obstacle {
 
