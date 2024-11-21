@@ -3,7 +3,7 @@ package game.manager;
 import java.util.List;
 
 import game.entities.character.Dinosaur;
-import game.entities.obstacles.Obstacle;
+import game.entities.obstacles.AbstractObstacle;
 import game.utils.SoundPlayer;
 
 public class CollisionManager {
@@ -20,7 +20,7 @@ public class CollisionManager {
         this.hitStartTime = 0;
     }
 
-    // Verifica si el dinosaurio ha sido golpeado
+    // Check if character has been hit
     public boolean isDinosaurHit(Dinosaur dinosaur) {
         if (dinosaur.getCurrentState() == Dinosaur.State.HIT) {
             long elapsedTime = System.currentTimeMillis() - hitStartTime;
@@ -29,12 +29,11 @@ public class CollisionManager {
         return false;
     }
     
-     // Maneja las colisiones entre el dinosaurio y los obstáculos
-     public void handleCollisions(Dinosaur dinosaur, List<Obstacle> obstacleList) {
+     public void handleCollisions(Dinosaur dinosaur, List<AbstractObstacle> obstacleList) {
         boolean collisionDetected = false;
 
         for (int i = 0; i < obstacleList.size(); i++) {
-            Obstacle obstacle = obstacleList.get(i);
+            AbstractObstacle obstacle = obstacleList.get(i);
 
             if (checkCollision(dinosaur, obstacleList)) {
                 collisionDetected = true;
@@ -52,12 +51,12 @@ public class CollisionManager {
         }
 
         if (!collisionDetected && dinosaur.hasCollided()) {
-            dinosaur.setCollided(false); // Restablece el estado del dinosaurio
+            dinosaur.setCollided(false);
         }
     }
 
-    public boolean checkCollision(Dinosaur dinosaur, List<Obstacle> obstacles) {
-            for (Obstacle obstacle : obstacles) {
+    public boolean checkCollision(Dinosaur dinosaur, List<AbstractObstacle> obstacles) {
+            for (AbstractObstacle obstacle : obstacles) {
                 if (dinosaur.getHitbox().intersects(obstacle.getHitbox())) {
                     return true;
                 }
@@ -65,7 +64,7 @@ public class CollisionManager {
         return false;
     }
 
-     // Maneja las consecuencias de una colisión (por ejemplo, el sonido y la actualización de vidas)
+     // Handle consecuences of collision (sound, update lives)
      private void handleDinosaurCollision(Dinosaur dinosaur) {
         dinosaur.onCollision();
         soundPlayer.setFile(2);

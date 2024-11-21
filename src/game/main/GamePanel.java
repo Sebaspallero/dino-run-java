@@ -4,10 +4,10 @@ import java.awt.*;
 
 import game.UI.GameOverScreen;
 import game.UI.Heart;
-import game.entities.Background;
-import game.entities.Floor;
 import game.entities.character.Dinosaur;
-import game.entities.obstacles.Obstacle;
+import game.entities.obstacles.AbstractObstacle;
+import game.entities.terrain.Background;
+import game.entities.terrain.Floor;
 import game.handlers.KeyHandler;
 import game.manager.CollisionManager;
 import game.manager.LivesManager;
@@ -82,8 +82,10 @@ public class GamePanel extends JPanel implements Runnable {
             this.running = true;
             new Thread(this).start();
     
-            soundPlayer.setFile(1);
-            soundPlayer.play();
+            /* soundPlayer.setFile(1);
+            soundPlayer.play(); */
+            soundPlayer.setFile(3);
+            soundPlayer.loop();
         }
     }
 
@@ -137,17 +139,18 @@ public class GamePanel extends JPanel implements Runnable {
         getDeltaTime();
 
         if (dinosaur.getCurrentState() == Dinosaur.State.HIT) {
-            dinosaur.update(); // Actualiza la animación de HIT
+            dinosaur.update(); // Update the hit animation
             if (collissionManager.isDinosaurHit(dinosaur)) {
                 gameOver = true;
             }
-            return; // Salimos del ciclo de actualización, pero dejamos que la animación se ejecute
+            return;
         }
 
         speedManager.update();
         dinosaur.update();
         scoreManager.update();
         floor.update(deltaTime, speedManager.getCurrentSpeed());
+        background.update(deltaTime, 100);
         obstacleManager.update(deltaTime, speedManager.getCurrentSpeed());
 
         collissionManager.handleCollisions(dinosaur, obstacleManager.getObstacleList());
@@ -176,7 +179,7 @@ public class GamePanel extends JPanel implements Runnable {
             heart.draw(g);
         }
 
-        for (Obstacle obstacle : obstacleManager.getObstacleList()) {
+        for (AbstractObstacle obstacle : obstacleManager.getObstacleList()) {
             obstacle.draw(g);
         }
 

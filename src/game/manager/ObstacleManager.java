@@ -4,77 +4,70 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import game.entities.obstacles.Obstacle;
+import game.entities.obstacles.AbstractObstacle;
+import game.entities.obstacles.ObstacleFactory;
 
 public class ObstacleManager {
 
-    private List<Obstacle> obstacleList;
+    private List<AbstractObstacle> obstacleList;
     private long lastObstacleTime;
     private long obstacleInterval;
     private long initialObstacleInterval;
     private long obstacleIncreaseInterval;
     private long lastDifficultyIncreaseTime;
 
-    // Constructor del manager de obstáculos
     public ObstacleManager() {
         this.obstacleList = new ArrayList<>();
         this.lastObstacleTime = System.currentTimeMillis();
-        this.initialObstacleInterval = 2500;  // Intervalo inicial de generación de obstáculos en milisegundos
+        this.initialObstacleInterval = 2500;  // Initial interval for obstacle generation in milliseconds
         this.obstacleInterval = initialObstacleInterval;
-        this.obstacleIncreaseInterval = 15000; // Intervalo en el que se reduce la distancia entre obstáculos (10 segundos)
+        this.obstacleIncreaseInterval = 15000; // Interval for reducing the distance between obstacles (15 seconds)
         this.lastDifficultyIncreaseTime = System.currentTimeMillis();
     }
 
-    // Método para actualizar los obstáculos, generar nuevos y manejar su dificultad
+    // Method to update obstacles, generate new ones, and manage difficulty
     public void update(double deltaTime, int currentSpeed) {
         long currentTime = System.currentTimeMillis();
 
-        // Generación de nuevos obstáculos si ha pasado el intervalo
+        // Generate new obstacles if the interval has passed
         if (currentTime - lastObstacleTime >= obstacleInterval) {
-            obstacleList.add(new Obstacle(48, 48));  // Crea un nuevo obstáculo de tamaño 48x48
+            obstacleList.add(ObstacleFactory.createObstacle());  
             lastObstacleTime = currentTime;
         }
 
-        // Actualización de los obstáculos existentes y eliminación de los que están fuera de pantalla
-        Iterator<Obstacle> iterator = obstacleList.iterator();
+        // Update existing obstacles and remove those that are off-screen
+        Iterator<AbstractObstacle> iterator = obstacleList.iterator();
         while (iterator.hasNext()) {
-            Obstacle obstacle = iterator.next();
-            obstacle.update(deltaTime, currentSpeed);  // Actualiza cada obstáculo
+            AbstractObstacle obstacle = iterator.next();
+            obstacle.update(deltaTime, currentSpeed);  
             if (obstacle.isOutOfScreen()) {
-                iterator.remove();  // Elimina de manera segura los obstáculos fuera de pantalla
+                iterator.remove();
             }
         }
 
-        // Incrementar la dificultad: disminuir la distancia entre obstáculos
+        // Increase difficulty: reduce the distance between obstacles
         increaseDifficulty();
     }
 
-    // Método para aumentar la dificultad del juego
+    // Method to increase the game's difficulty
     private void increaseDifficulty() {
         long currentTime = System.currentTimeMillis();
-        
-        // Si ha pasado el tiempo de intervalo para aumentar la dificultad
+    
         if (currentTime - lastDifficultyIncreaseTime >= obstacleIncreaseInterval) {
-            // Reducir el intervalo de generación de obstáculos para aumentar la dificultad
-            obstacleInterval = Math.max(obstacleInterval - 250, 550); // Limitar el intervalo a un mínimo de 700 ms
-            lastDifficultyIncreaseTime = currentTime;  // Reiniciar el temporizador de aumento de dificultad
+            // Reduce the generation interval for obstacles to increase difficulty
+            obstacleInterval = Math.max(obstacleInterval - 250, 550); // Limit the interval to a minimum of 550 ms
+            lastDifficultyIncreaseTime = currentTime;
         }
     }
 
-    // Método para restablecer todos los obstáculos (al reiniciar el juego, por ejemplo)
+    // Method to reset all obstacles
     public void resetObstacles() {
         obstacleList.clear();
-        this.obstacleInterval = initialObstacleInterval;  // Restaurar el intervalo inicial de generación
-        this.lastObstacleTime = System.currentTimeMillis();  // Reiniciar el temporizador
+        this.obstacleInterval = initialObstacleInterval; 
+        this.lastObstacleTime = System.currentTimeMillis();
     }
 
-    // Método para obtener la lista de obstáculos
-    public List<Obstacle> getObstacleList() {
+    public List<AbstractObstacle> getObstacleList() {
         return obstacleList;
-    }
-    
-    // Método para cambiar manualmente el intervalo de generación de obstáculos (si se necesita en el futuro)
-    public void setObstacleInterval(long newInterval) {
-        this.obstacleInterval = newInterval;
     }
 }

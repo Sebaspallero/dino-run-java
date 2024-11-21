@@ -66,7 +66,7 @@ public class Dinosaur {
             animations.put(State.HIT, createAnimator("/resources/sprites/frog-hit.png", 2, 7,70));
             animations.put(State.JUMPING, createAnimator("/resources/sprites/frog-jump.png", 2, 1,90));
             animations.put(State.FALLING, createAnimator("/resources/sprites/frog-fall.png", 2, 1,90));
-            animations.put(State.CROUCHING, createAnimator("/resources/sprites/dinosaur-crouch-sheet.png", 2, 6,100));
+            animations.put(State.CROUCHING, createAnimator("/resources/sprites/frog-roll.png", 2, 5,90));
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -75,7 +75,7 @@ public class Dinosaur {
 
     public Animator createAnimator(String path, int scaleFactor, int frameCount, int frameDelay) throws Exception{
         Image spriteSheet = ImageIO.read(getClass().getResource(path));
-        return new Animator(spriteSheet, 32 * scaleFactor, 32 * scaleFactor, frameCount, frameDelay,0);
+        return new Animator(spriteSheet, 64, 64, frameCount, frameDelay,0);
     }
 
     //Update States of the character

@@ -16,7 +16,7 @@ public class FontLoader {
             
         } catch (FontFormatException | IOException e) {
             e.printStackTrace();
-            return new Font("Arial", Font.PLAIN, (int) size); // Fuente predeterminada si hay un error
+            return new Font("Arial", Font.PLAIN, (int) size); //Default font
         }
     }
 }
