@@ -12,7 +12,8 @@ public class CollisionManager {
     private LivesManager livesManager;
 
     private long hitStartTime;
-    private final long HIT_DURATION = 1000;
+    private final long HIT_DURATION = 400;
+
 
     public CollisionManager(SoundPlayer soundPlayer, LivesManager livesManager) {
         this.soundPlayer = soundPlayer;
@@ -20,8 +21,8 @@ public class CollisionManager {
         this.hitStartTime = 0;
     }
 
-    // Check if character has been hit
-    public boolean isDinosaurHit(Dinosaur dinosaur) {
+      // Check if character has been hit
+      public boolean isDinosaurHit(Dinosaur dinosaur) {
         if (dinosaur.getCurrentState() == Dinosaur.State.HIT) {
             long elapsedTime = System.currentTimeMillis() - hitStartTime;
             return elapsedTime >= HIT_DURATION;
@@ -65,7 +66,7 @@ public class CollisionManager {
     }
 
      // Handle consecuences of collision (sound, update lives)
-     private void handleDinosaurCollision(Dinosaur dinosaur) {
+    private void handleDinosaurCollision(Dinosaur dinosaur) {
         dinosaur.onCollision();
         soundPlayer.setFile(2);
         soundPlayer.play();

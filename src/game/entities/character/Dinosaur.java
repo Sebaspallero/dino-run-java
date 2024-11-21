@@ -80,38 +80,44 @@ public class Dinosaur {
 
     //Update States of the character
     public void update() {
-        if (jumping) {
-            handleJump();
-        } else if (crouching) {
-            currentState = State.CROUCHING;
-        } else if (currentState != State.HIT) {
-            currentState = State.RUNNING;
+        if (currentState != State.HIT) {
+            // Solo actualizamos la lógica de salto, caída y otras acciones si no estamos en HIT
+            if (jumping) {
+                handleJump();
+            } else if (crouching) {
+                currentState = State.CROUCHING;
+            } else {
+                currentState = State.RUNNING;
+            }
         }
-
+    
+        // Si está en estado HIT, solo actualizamos la animación
         animations.get(currentState).update();
-        updateHitbox();
+    
+        updateHitbox();  // Actualizamos el hitbox independientemente del estado
     }
 
     private void handleJump() {
-        velocityY += GRAVITY;
-        y += velocityY;
+        velocityY += GRAVITY;  // La gravedad sigue afectando al personaje
+        y += velocityY;        // Actualizamos la posición Y según la velocidad vertical
 
         if (velocityY < 0) {
-            currentState = State.JUMPING;
+            currentState = State.JUMPING;  // Si el personaje está subiendo, se mantiene en el estado de salto
         } else if (velocityY > 0) {
-            currentState = State.FALLING;
+            currentState = State.FALLING;  // Si el personaje está cayendo, se mantiene en el estado de caída
         }
 
+        // Si llega al suelo, vuelve al estado RUNNING
         if (y >= GROUND_Y) {
             resetToGround();
         }
     }
 
     private void resetToGround() {
-        y = GROUND_Y;
-        jumping = false;
-        velocityY = 0;
-        currentState = State.RUNNING;
+        y = GROUND_Y;        // Coloca al dinosaurio en el suelo
+        jumping = false;     // Detiene el salto
+        velocityY = 0;       // Detenemos la velocidad vertical
+        currentState = State.RUNNING;  // Cambia al estado de correr
     }
 
     //Character Hitbox
@@ -141,12 +147,12 @@ public class Dinosaur {
     }
 
     public void onCollision() {
-        this.currentState = State.HIT;
-        this.collided = true; 
-        this.jumping = false; 
-        this.velocityY = 0;
-        this.y = GROUND_Y;
-        this.crouching = false;
+        this.currentState = State.HIT;  // Cambia solo el estado para la animación de colisión
+        this.collided = true;  // Marca que el dinosaurio ha colisionado
+    
+        // No modificamos la posición o la velocidad. La física sigue intacta.
+          // Detiene el salto si estaba saltando, pero sin afectar la gravedad  // Detenemos el movimiento vertical solo temporalmente, para la animación de colisión
+        this.crouching = false; // Asegura que el dinosaurio no permanezca agachado durante la colisión
     }
 
     //Draw the character
@@ -175,5 +181,9 @@ public class Dinosaur {
     
     public void setCollided(boolean collided) {
         this.collided = collided;
+    }
+
+    public void setCurrentState(State newState){
+        this.currentState = newState;
     }
 }

@@ -1,42 +1,51 @@
 package game.manager;
 
+
+import java.util.ArrayList;
+import java.util.List;
+
 import game.UI.Heart;
 import game.entities.character.Dinosaur;
 
 public class LivesManager {
 
-    private Heart[] heartArray;
+    private List <Heart> hearts = new ArrayList<>();
 
     public LivesManager() {
-        heartArray = new Heart[3];
-
-        heartArray[0] = new Heart(10, true);
-        heartArray[1] = new Heart(42, true);
-        heartArray[2] = new Heart(74, true);
+        hearts.add(new Heart(10, true));
+        hearts.add(new Heart(42, true));
+        hearts.add(new Heart(74, true));
     }
 
     public void updateHeart(Dinosaur dinosaur){
         if (dinosaur.hasCollided()) {
-            for (int i = 0; i < heartArray.length; i++) {
-                if (heartArray[i].isFull()) {
-                    heartArray[i].setFull(false);
+            for (int i = 0; i < hearts.size(); i++) {
+                if (hearts.get(i).isFull()) {
+                    hearts.get(i).setFull(false);
                     break;
                 }
             }
         }
     }
 
+    public boolean checkHearts(){
+        if (hearts.get(2).isFull()) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
     public void resetHearts(){
-        heartArray = new Heart[3];
-
-        heartArray[0] = new Heart(10, true);
-        heartArray[1] = new Heart(42, true);
-        heartArray[2] = new Heart(74, true);
+        hearts.clear();
+        
+        hearts.add(new Heart(10, true));
+        hearts.add(new Heart(42, true));
+        hearts.add(new Heart(74, true));
     }
 
-    public Heart[] getHearts() {
-        return heartArray;
+    public List <Heart> getHearts() {
+        return hearts;
     }
-
     
 }

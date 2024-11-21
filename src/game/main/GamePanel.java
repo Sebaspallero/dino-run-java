@@ -104,12 +104,12 @@ public class GamePanel extends JPanel implements Runnable {
         this.speedManager.resetSpeed(initialSpeed);
         this.scoreManager.resetScore();
         this.livesManager.resetHearts();
+        this.collissionManager.setHitStartTime(0);
         this.dinosaur = new Dinosaur();  
         this.floor = new Floor();  
         this.background = new Background(); 
         
         this.keyHandler.setDinosaur(this.dinosaur);
-        this.collissionManager.setHitStartTime(0);
         this.lastTime = System.nanoTime();
 
         this.running = true;
@@ -138,12 +138,8 @@ public class GamePanel extends JPanel implements Runnable {
         //Calculate Delta Time
         getDeltaTime();
 
-        if (dinosaur.getCurrentState() == Dinosaur.State.HIT) {
-            dinosaur.update(); // Update the hit animation
-            if (collissionManager.isDinosaurHit(dinosaur)) {
-                gameOver = true;
-            }
-            return;
+        if (collissionManager.isDinosaurHit(dinosaur)) {
+            dinosaur.setCurrentState(Dinosaur.State.RUNNING); 
         }
 
         speedManager.update();
@@ -152,8 +148,11 @@ public class GamePanel extends JPanel implements Runnable {
         floor.update(deltaTime, speedManager.getCurrentSpeed());
         background.update(deltaTime, 100);
         obstacleManager.update(deltaTime, speedManager.getCurrentSpeed());
-
         collissionManager.handleCollisions(dinosaur, obstacleManager.getObstacleList());
+
+        if (livesManager.checkHearts()) {
+            gameOver = true;
+        }
     }
 
     private void getDeltaTime(){
