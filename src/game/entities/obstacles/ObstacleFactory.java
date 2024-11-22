@@ -12,7 +12,7 @@ public class ObstacleFactory {
             case 0:
                 return new Spike(); 
             case 1:
-                return new Bird(); 
+                return new Bird();
             default:
                 throw new IllegalStateException("Tipo de obstáculo no válido");
         }
