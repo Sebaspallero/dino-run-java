@@ -10,16 +10,19 @@ import game.entities.character.Dinosaur;
 public class LivesManager {
 
     private List <Heart> hearts = new ArrayList<>();
+    private final int FIRST = 65;
+    private final int SECOND = 97;
+    private final int THIRD = 129;
 
     public LivesManager() {
-        hearts.add(new Heart(10, true));
-        hearts.add(new Heart(42, true));
-        hearts.add(new Heart(74, true));
+        hearts.add(new Heart(FIRST, true));
+        hearts.add(new Heart(SECOND, true));
+        hearts.add(new Heart(THIRD, true));
     }
 
     public void updateHeart(Dinosaur dinosaur){
         if (dinosaur.hasCollided()) {
-            for (int i = 0; i < hearts.size(); i++) {
+            for (int i = 2; i >= 0; i--) {
                 if (hearts.get(i).isFull()) {
                     hearts.get(i).setFull(false);
                     break;
@@ -29,7 +32,7 @@ public class LivesManager {
     }
 
     public boolean checkHearts(){
-        if (hearts.get(2).isFull()) {
+        if (hearts.get(0).isFull()) {
             return false;
         } else {
             return true;
@@ -39,9 +42,9 @@ public class LivesManager {
     public void resetHearts(){
         hearts.clear();
         
-        hearts.add(new Heart(10, true));
-        hearts.add(new Heart(42, true));
-        hearts.add(new Heart(74, true));
+        hearts.add(new Heart(FIRST, true));
+        hearts.add(new Heart(SECOND, true));
+        hearts.add(new Heart(THIRD, true));
     }
 
     public List <Heart> getHearts() {

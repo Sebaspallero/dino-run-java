@@ -1,5 +1,6 @@
 package game.main;
 
+import java.awt.*;
 import javax.swing.JFrame;
 
 public class Game extends JFrame{
@@ -8,7 +9,8 @@ public class Game extends JFrame{
     public static final int SCREEN_HEIGHT = 350;
 
     public static void main(String[] args) {
-        JFrame frame = new JFrame("Dino Run");
+        JFrame frame = new JFrame("Run or Croak");
+        Image icon = Toolkit.getDefaultToolkit().getImage(Game.class.getResource("/resources/sprites/icon.png"));
         GamePanel gp = new GamePanel();
 
         frame.add(gp);
@@ -17,6 +19,7 @@ public class Game extends JFrame{
         frame.setLocationRelativeTo(null);
         frame.setResizable(false);
         frame.setVisible(true);
+        frame.setIconImage(icon);
 
         gp.startGame();
     }

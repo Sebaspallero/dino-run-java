@@ -12,7 +12,7 @@ public class CollisionManager {
     private LivesManager livesManager;
 
     private long hitStartTime;
-    private final long HIT_DURATION = 400;
+    private final long HIT_DURATION = 500;
 
 
     public CollisionManager(SoundPlayer soundPlayer, LivesManager livesManager) {

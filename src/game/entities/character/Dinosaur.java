@@ -62,11 +62,11 @@ public class Dinosaur {
     //Load animations for each state
     public void initializeAnimations(){
         try {
-            animations.put(State.RUNNING, createAnimator("/resources/sprites/frog-run.png", 2, 12,90));
-            animations.put(State.HIT, createAnimator("/resources/sprites/frog-hit.png", 2, 7,70));
-            animations.put(State.JUMPING, createAnimator("/resources/sprites/frog-jump.png", 2, 1,90));
-            animations.put(State.FALLING, createAnimator("/resources/sprites/frog-fall.png", 2, 1,90));
-            animations.put(State.CROUCHING, createAnimator("/resources/sprites/frog-roll.png", 2, 5,90));
+            animations.put(State.RUNNING, createAnimator("/resources/sprites/frog-run.png", 2, 12,50));
+            animations.put(State.HIT, createAnimator("/resources/sprites/frog-hit.png", 2, 7,50));
+            animations.put(State.JUMPING, createAnimator("/resources/sprites/frog-jump.png", 2, 1,50));
+            animations.put(State.FALLING, createAnimator("/resources/sprites/frog-fall.png", 2, 1,50));
+            animations.put(State.CROUCHING, createAnimator("/resources/sprites/frog-roll.png", 2, 5,50));
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -147,12 +147,9 @@ public class Dinosaur {
     }
 
     public void onCollision() {
-        this.currentState = State.HIT;  // Cambia solo el estado para la animación de colisión
-        this.collided = true;  // Marca que el dinosaurio ha colisionado
-    
-        // No modificamos la posición o la velocidad. La física sigue intacta.
-          // Detiene el salto si estaba saltando, pero sin afectar la gravedad  // Detenemos el movimiento vertical solo temporalmente, para la animación de colisión
-        this.crouching = false; // Asegura que el dinosaurio no permanezca agachado durante la colisión
+        this.currentState = State.HIT;
+        this.collided = true;  
+        this.crouching = false; 
     }
 
     //Draw the character

@@ -2,6 +2,7 @@ package game.main;
 
 import java.awt.*;
 
+import game.UI.CharacterFrame;
 import game.UI.GameOverScreen;
 import game.UI.Heart;
 import game.entities.character.Dinosaur;
@@ -25,6 +26,7 @@ public class GamePanel extends JPanel implements Runnable {
     private Dinosaur dinosaur;
     private Floor floor;
     private Background background;
+    private CharacterFrame characterFrame;
 
     private LivesManager livesManager;
     private ScoreManager scoreManager;
@@ -32,10 +34,8 @@ public class GamePanel extends JPanel implements Runnable {
     private CollisionManager collissionManager;
     private ObstacleManager obstacleManager;
 
-
-    @SuppressWarnings("unused")
     private Font customBoldFont;
-    private Font customFont;
+    /* private Font customFont; */
 
     private boolean running;
     private boolean gameOver;
@@ -55,6 +55,7 @@ public class GamePanel extends JPanel implements Runnable {
         this.dinosaur = new Dinosaur();
         this.floor = new Floor();
         this.background = new Background();
+        this.characterFrame = new CharacterFrame();
 
         this.scoreManager = new ScoreManager();
         this.livesManager = new LivesManager();
@@ -62,8 +63,8 @@ public class GamePanel extends JPanel implements Runnable {
         this.collissionManager = new CollisionManager(new SoundPlayer(), livesManager);
         this.obstacleManager = new ObstacleManager();
         
-        this.customFont = FontLoader.loadFont("/resources/font/PixelOperator8.ttf", 16f);
-        this.customBoldFont = FontLoader.loadFont("/resources/font/PixelOperator8-Bold.ttf", 24f);
+        /* this.customFont = FontLoader.loadFont("/resources/font/AvenuePixelStroke-Regular.ttf", 16f); */
+        this.customBoldFont = FontLoader.loadFont("/resources/font/AvenuePixelStroke-Regular.ttf", 40f);
 
         this.keyHandler = new KeyHandler(dinosaur,this);
         this.soundPlayer = new SoundPlayer();
@@ -171,8 +172,18 @@ public class GamePanel extends JPanel implements Runnable {
         super.paintComponent(g);
 
         background.draw(g, getWidth(), getHeight());
+
+        /* try {
+            Image image = ImageIO.read(getClass().getResource("/resources/sprites/title-screen.png"));
+            g.drawImage(image, 300, 115, null);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } */
+       
+
         floor.draw(g);
         dinosaur.draw(g);
+        characterFrame.draw(g);
 
         for (Heart heart : livesManager.getHearts()) {
             heart.draw(g);
@@ -182,7 +193,13 @@ public class GamePanel extends JPanel implements Runnable {
             obstacle.draw(g);
         }
 
-        TextGenerator scoreText = new TextGenerator("Score: " + scoreManager.getScore(), 20, 20, customFont, Color.WHITE);
+        String score = "" + scoreManager.getScore();
+        FontMetrics metrics = g.getFontMetrics(customBoldFont);
+        int textWidth = metrics.stringWidth(score);
+
+        int posX = (getWidth() - textWidth) / 2;
+
+        TextGenerator scoreText = new TextGenerator(score, posX, 40, customBoldFont, Color.WHITE);
         scoreText.draw(g);
 
         if (gameOver) {

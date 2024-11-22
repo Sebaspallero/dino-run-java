@@ -17,7 +17,7 @@ public class Bird extends AbstractObstacle{
 
         try {
             Image birdSpriteSheet = ImageIO.read(getClass().getResource("/resources/sprites/blue-bird.png"));
-            this.animator = new Animator(birdSpriteSheet, 32, 32, 9, 80, 0); // Configura el Animator
+            this.animator = new Animator(birdSpriteSheet, 32, 32, 9, 50, 0); // Configura el Animator
         } catch (Exception e) {
             e.printStackTrace();
         }

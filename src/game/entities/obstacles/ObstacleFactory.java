@@ -7,6 +7,7 @@ public class ObstacleFactory {
 
     public static AbstractObstacle createObstacle() {
         int obstacleType = RANDOM.nextInt(2);
+        
         switch (obstacleType) {
             case 0:
                 return new Spike(); 

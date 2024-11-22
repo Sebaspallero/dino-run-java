@@ -16,10 +16,10 @@ public class Heart {
 
 
     public Heart(int x, boolean isFull) {
-        this.width = 32 * 2;
-        this.height = 32 * 2;
+        this.width = 12 * 2;
+        this.height = 12 * 2;
         this.x = x;
-        this.y = 20;
+        this.y = 25;
         this.isFull = isFull;
 
         initializeHeartImage();
