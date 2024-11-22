@@ -31,7 +31,7 @@ public class ObstacleManager {
 
         // Generate new obstacles if the interval has passed
         if (currentTime - lastObstacleTime >= obstacleInterval) {
-            obstacleList.add(ObstacleFactory.createObstacle());  
+            obstacleList.add(ObstacleFactory.createObstacle());
             lastObstacleTime = currentTime;
         }
 

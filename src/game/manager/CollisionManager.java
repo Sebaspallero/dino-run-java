@@ -1,8 +1,9 @@
 package game.manager;
 
 import java.util.List;
-
 import game.entities.character.Dinosaur;
+import game.entities.items.AbstractItem;
+import game.entities.items.Cherry;
 import game.entities.obstacles.AbstractObstacle;
 import game.utils.SoundPlayer;
 
@@ -14,67 +15,87 @@ public class CollisionManager {
     private long hitStartTime;
     private final long HIT_DURATION = 500;
 
-
     public CollisionManager(SoundPlayer soundPlayer, LivesManager livesManager) {
         this.soundPlayer = soundPlayer;
         this.livesManager = livesManager;
         this.hitStartTime = 0;
     }
 
-      // Check if character has been hit
-      public boolean isDinosaurHit(Dinosaur dinosaur) {
+    // Check if character has been hit
+    public boolean isDinosaurHit(Dinosaur dinosaur) {
         if (dinosaur.getCurrentState() == Dinosaur.State.HIT) {
             long elapsedTime = System.currentTimeMillis() - hitStartTime;
             return elapsedTime >= HIT_DURATION;
         }
         return false;
     }
-    
-     public void handleCollisions(Dinosaur dinosaur, List<AbstractObstacle> obstacleList) {
+
+    // Manejo de las colisiones con obstáculos
+    public void handleObstacleCollisions(Dinosaur dinosaur, List<AbstractObstacle> obstacleList) {
         boolean collisionDetected = false;
 
+        // Colisiones con obstáculos
         for (int i = 0; i < obstacleList.size(); i++) {
             AbstractObstacle obstacle = obstacleList.get(i);
 
-            if (checkCollision(dinosaur, obstacleList)) {
+            if (checkCollision(dinosaur, obstacle)) {
                 collisionDetected = true;
 
                 if (!dinosaur.hasCollided()) {
-                    handleDinosaurCollision(dinosaur);
+                    handleDinosaurCollision(dinosaur);  // Solo afecta la vida por obstáculos
                 }
                 break;
             }
 
+            // Eliminar obstáculos que salen de la pantalla
             if (obstacle.isOutOfScreen()) {
                 obstacleList.remove(i);
                 i--;
             }
         }
 
+        // Resetear el estado de colisión del dinosaurio si no hubo colisión
         if (!collisionDetected && dinosaur.hasCollided()) {
             dinosaur.setCollided(false);
         }
     }
 
-    public boolean checkCollision(Dinosaur dinosaur, List<AbstractObstacle> obstacles) {
-            for (AbstractObstacle obstacle : obstacles) {
-                if (dinosaur.getHitbox().intersects(obstacle.getHitbox())) {
-                    return true;
-                }
-            }
-        return false;
+    // Manejo de las colisiones con cerezas
+    public void handleCherryCollisions(Dinosaur dinosaur, List<AbstractItem> itemList) {
+        for (int i = 0; i < itemList.size(); i++) {
+            AbstractItem item = itemList.get(i);
+
+            // Si el dinosaurio colide con la cereza y la cereza está en estado IDLE
+           if (checkItemCollision(dinosaur, item) && item.getCurrentState() == Cherry.State.IDLE) {
+                item.setCurrentState(AbstractItem.State.COLLECTED); // Cambiar a estado "collected"
+                soundPlayer.setFile(1);  // Sonido de recolección de item
+                soundPlayer.play();
+                itemList.remove(i);  // Eliminar la cereza de la lista después de ser recolectada
+                i--;  // Ajustamos el índice después de remover la cereza
+        }
+        }
     }
 
-     // Handle consecuences of collision (sound, update lives)
+    // Verifica colisión entre el dinosaurio y un obstáculo
+    public boolean checkCollision(Dinosaur dinosaur, AbstractObstacle obstacle) {
+        return dinosaur.getHitbox().intersects(obstacle.getHitbox());
+    }
+
+    // Verifica colisión entre el dinosaurio y una cereza
+    public boolean checkItemCollision(Dinosaur dinosaur, AbstractItem item) {
+        return dinosaur.getHitbox().intersects(item.getHitbox());
+    }
+
+    // Manejo de las consecuencias de la colisión con un obstáculo (sonido, vidas, etc.)
     private void handleDinosaurCollision(Dinosaur dinosaur) {
         dinosaur.onCollision();
-        soundPlayer.setFile(2);
+        soundPlayer.setFile(2); // Sonido de colisión
         soundPlayer.play();
         hitStartTime = System.currentTimeMillis();
-        livesManager.updateHeart(dinosaur);
+        livesManager.updateHeart(dinosaur); // Actualiza las vidas del dinosaurio
     }
 
-    public void setHitStartTime(int newHitStartTime){
-         this.hitStartTime = newHitStartTime;
+    public void setHitStartTime(int newHitStartTime) {
+        this.hitStartTime = newHitStartTime;
     }
 }

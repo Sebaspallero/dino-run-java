@@ -6,11 +6,13 @@ import game.UI.CharacterFrame;
 import game.UI.GameOverScreen;
 import game.UI.Heart;
 import game.entities.character.Dinosaur;
+import game.entities.items.AbstractItem;
 import game.entities.obstacles.AbstractObstacle;
 import game.entities.terrain.Background;
 import game.entities.terrain.Floor;
 import game.handlers.KeyHandler;
 import game.manager.CollisionManager;
+import game.manager.ItemManager;
 import game.manager.LivesManager;
 import game.manager.ObstacleManager;
 import game.manager.ScoreManager;
@@ -33,6 +35,7 @@ public class GamePanel extends JPanel implements Runnable {
     private SpeedManager speedManager;
     private CollisionManager collissionManager;
     private ObstacleManager obstacleManager;
+    private ItemManager itemManager;
 
     private Font customBoldFont;
     /* private Font customFont; */
@@ -62,6 +65,7 @@ public class GamePanel extends JPanel implements Runnable {
         this.speedManager = new SpeedManager(initialSpeed, speedIncreaseInterval);
         this.collissionManager = new CollisionManager(new SoundPlayer(), livesManager);
         this.obstacleManager = new ObstacleManager();
+        this.itemManager = new ItemManager();
         
         /* this.customFont = FontLoader.loadFont("/resources/font/AvenuePixelStroke-Regular.ttf", 16f); */
         this.customBoldFont = FontLoader.loadFont("/resources/font/AvenuePixelStroke-Regular.ttf", 40f);
@@ -102,6 +106,7 @@ public class GamePanel extends JPanel implements Runnable {
         this.gameOver = false;
         
         this.obstacleManager.resetObstacles();
+        this.itemManager.resetItems();
         this.speedManager.resetSpeed(initialSpeed);
         this.scoreManager.resetScore();
         this.livesManager.resetHearts();
@@ -109,6 +114,7 @@ public class GamePanel extends JPanel implements Runnable {
         this.dinosaur = new Dinosaur();  
         this.floor = new Floor();  
         this.background = new Background(); 
+       
         
         this.keyHandler.setDinosaur(this.dinosaur);
         this.lastTime = System.nanoTime();
@@ -149,7 +155,9 @@ public class GamePanel extends JPanel implements Runnable {
         floor.update(deltaTime, speedManager.getCurrentSpeed());
         background.update(deltaTime, 100);
         obstacleManager.update(deltaTime, speedManager.getCurrentSpeed());
-        collissionManager.handleCollisions(dinosaur, obstacleManager.getObstacleList());
+        itemManager.update(deltaTime, speedManager.getCurrentSpeed());
+        collissionManager.handleObstacleCollisions(dinosaur, obstacleManager.getObstacleList());
+        collissionManager.handleCherryCollisions(dinosaur, itemManager.getCherryList());
 
         if (livesManager.checkHearts()) {
             gameOver = true;
@@ -191,6 +199,10 @@ public class GamePanel extends JPanel implements Runnable {
 
         for (AbstractObstacle obstacle : obstacleManager.getObstacleList()) {
             obstacle.draw(g);
+        }
+
+        for (AbstractItem item : itemManager.getCherryList()) {
+            item.draw(g);
         }
 
         String score = "" + scoreManager.getScore();
