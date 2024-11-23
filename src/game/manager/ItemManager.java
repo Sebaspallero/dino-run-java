@@ -4,8 +4,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import game.entities.EntityFactory;
 import game.entities.items.AbstractItem;
-import game.entities.items.ItemFactory;
+
 
 public class ItemManager {
 
@@ -16,7 +17,7 @@ public class ItemManager {
     public ItemManager() {
         this.cherryList = new ArrayList<>();
         this.lastItemTime = System.currentTimeMillis();
-        this.itemInterval = 3000; // Generar ítems cada 5 segundos (ejemplo)
+        this.itemInterval = 4000; // Generar ítems cada 5 segundos (ejemplo)
     }
 
     // Método para actualizar las cerezas
@@ -25,7 +26,7 @@ public class ItemManager {
 
         // Generar nuevas cerezas si ha pasado el intervalo
         if (currentTime - lastItemTime >= itemInterval) {
-            cherryList.addAll(ItemFactory.createItems());
+            cherryList.addAll(EntityFactory.createItems());
             lastItemTime = currentTime;
         }
 

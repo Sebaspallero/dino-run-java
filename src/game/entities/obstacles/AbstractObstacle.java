@@ -1,9 +1,11 @@
 package game.entities.obstacles;
 import java.awt.*;
+
+import game.entities.AbstractEntity;
 import game.entities.Hitbox;
 import game.utils.Animator;
 
-public abstract class AbstractObstacle {
+public abstract class AbstractObstacle extends AbstractEntity{
     protected int x;
     protected int y;
     protected int width;

@@ -147,10 +147,11 @@ public class Dinosaur {
     }
 
     public void onCollision() {
+        this.currentState = State.HIT;
         this.collided = true;  
-        if (currentState != State.JUMPING && currentState != State.FALLING) {
-            this.currentState = State.HIT; // Cambiar la animación, pero no bloquear salto/caída
-        }
+        this.crouching = false;
+        this.velocityY = 0;
+        this.y = GROUND_Y; 
     }
 
     //Draw the character

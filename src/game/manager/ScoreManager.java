@@ -24,10 +24,13 @@ public class ScoreManager {
         this.scoreTimer = 0;
     }
 
+    public void addPoints(int points) {
+        this.score += points;
+    }
+
     public int getScore(){
         return this.score;
     }
-
     
 
 }

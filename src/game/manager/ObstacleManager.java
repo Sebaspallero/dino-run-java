@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import game.entities.EntityFactory;
 import game.entities.obstacles.AbstractObstacle;
-import game.entities.obstacles.ObstacleFactory;
 
 public class ObstacleManager {
 
@@ -31,7 +31,7 @@ public class ObstacleManager {
 
         // Generate new obstacles if the interval has passed
         if (currentTime - lastObstacleTime >= obstacleInterval) {
-            obstacleList.add(ObstacleFactory.createObstacle());
+            obstacleList.addAll(EntityFactory.createObstacles());
             lastObstacleTime = currentTime;
         }
 

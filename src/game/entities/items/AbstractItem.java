@@ -1,10 +1,12 @@
 package game.entities.items;
 
 import java.awt.*;
+
+import game.entities.AbstractEntity;
 import game.entities.Hitbox;
 import game.utils.Animator;
 
-public abstract class AbstractItem {
+public abstract class AbstractItem extends AbstractEntity{
     protected int x;
     protected int y;
     protected int width;
