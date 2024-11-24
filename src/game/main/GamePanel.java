@@ -2,33 +2,54 @@ package game.main;
 
 import java.awt.*;
 
-import game.entities.Background;
-import game.entities.Dinosaur;
-import game.entities.Floor;
-import game.entities.Obstacle;
-import game.sound.SoundPlayer;
-
-import java.util.ArrayList;
-import java.util.List;
+import game.UI.CharacterFrame;
+import game.UI.GameOverScreen;
+import game.UI.Heart;
+import game.UI.IntroScreen;
+import game.UI.TitleScreen;
+import game.entities.AbstractEntity;
+import game.entities.character.Character;
+import game.entities.items.AbstractItem;
+import game.entities.obstacles.AbstractObstacle;
+import game.entities.terrain.Background;
+import game.entities.terrain.Floor;
+import game.handlers.KeyHandler;
+import game.manager.CollisionManager;
+import game.manager.EntityManager;
+import game.manager.LivesManager;
+import game.manager.ScoreManager;
+import game.manager.SpeedManager;
+import game.utils.FontLoader;
+import game.utils.SoundPlayer;
+import game.utils.TextGenerator;
 
 import javax.swing.JPanel;
 
 public class GamePanel extends JPanel implements Runnable {
 
-    private Dinosaur dinosaur;
-    private List<Obstacle> obstacleList;
+    //Game states
+    public enum GameState {
+        INTRO,
+        TITLE,
+        PLAYING,
+        GAME_OVER
+    }
+
+    //Atributes
+
+    private Character character;
     private Floor floor;
     private Background background;
+    private CharacterFrame characterFrame;
+
+    private LivesManager livesManager;
+    private ScoreManager scoreManager;
+    private SpeedManager speedManager;
+    private CollisionManager collissionManager;
+    private EntityManager entityManager;
 
     private Font customBoldFont;
     private Font customFont;
-
-    private int score;
-    private int scoreTimer;
-    private final int SCORE_DELAY = 7;
-
-    private long hitStartTime;
-    private final long HIT_DURATION = 1000;
 
     private boolean running;
     private boolean gameOver;
@@ -36,29 +57,41 @@ public class GamePanel extends JPanel implements Runnable {
     private KeyHandler keyHandler;
     private SoundPlayer soundPlayer;
 
-    private int currentSpeed = 300; // Velocidad inicial de los obstáculos
-    private long lastObstacleTime = System.currentTimeMillis();
-    private long obstacleInterval = 2000; // Tiempo entre obstáculos (en ms)
-    private long lastSpeedIncreaseTime = System.currentTimeMillis();
-    private long speedIncreaseInterval = 10000; // Incrementar velocidad cada 10 segundos
+    private int initialSpeed = 250;
+    private long speedIncreaseInterval = 15000;
 
-    private double deltaTime;  // Variable para almacenar el deltaTime
+    private double deltaTime;
     private long lastTime;
+
+    private Thread gameThread;
+
+    private GameState gameState;
+    private long introStartTime;
+    private boolean showTitleOnce = true;
+
+    //Constructor
 
     public GamePanel() {
         this.running = false;
 
-        this.dinosaur = new Dinosaur();
-        this.obstacleList = new ArrayList<>();
+        this.gameState = GameState.INTRO;
+        this.introStartTime = System.currentTimeMillis();
+
+        this.character = new Character(this);
         this.floor = new Floor();
         this.background = new Background();
-        this.score = 0;
-        this.scoreTimer = 0;
-        
-        customFont = FontLoader.loadFont("/resources/font/PixelOperator8.ttf", 16f);
-        customBoldFont = FontLoader.loadFont("/resources/font/PixelOperator8-Bold.ttf", 24f);
+        this.characterFrame = new CharacterFrame();
 
-        this.keyHandler = new KeyHandler(dinosaur,this);
+        this.scoreManager = new ScoreManager();
+        this.livesManager = new LivesManager();
+        this.speedManager = new SpeedManager(initialSpeed, speedIncreaseInterval);
+        this.collissionManager = new CollisionManager(new SoundPlayer(), livesManager, scoreManager);
+        this.entityManager = new EntityManager(this, character);
+
+        this.customBoldFont = FontLoader.loadFont("/resources/font/AvenuePixelStroke-Regular.ttf", 40f);
+        this.customFont = FontLoader.loadFont("/resources/font/AvenuePixel-Regular.ttf", 40f);
+
+        this.keyHandler = new KeyHandler(character, this);
         this.soundPlayer = new SoundPlayer();
 
         this.gameOver = false;
@@ -67,211 +100,185 @@ public class GamePanel extends JPanel implements Runnable {
         setFocusable(true);
 
         this.lastTime = System.nanoTime();
-        
+
     }
+
+    //Start the game for the first time
 
     public void startGame() {
         if (!running) {
             this.running = true;
-            new Thread(this).start();
-    
-            soundPlayer.setFile(1);
-            soundPlayer.play();
+            if (gameThread == null) {
+                gameThread = new Thread(this);
+                gameThread.start();
+                soundPlayer.setFile(3);
+                soundPlayer.loop();
+            }
         }
     }
 
-    public void resetGame(){
+    //Restart the game after Game Over
+    public void resetGame() {
         this.running = false;
 
         try {
-            Thread.sleep(100);  // Dar tiempo para detener el hilo correctamente
+            Thread.sleep(100);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
         this.gameOver = false;
-        this.currentSpeed = 300;  // Reinicia la velocidad
-        this.lastObstacleTime = System.currentTimeMillis();
-        this.lastSpeedIncreaseTime = System.currentTimeMillis();
-        this.obstacleList.clear();  // Limpia los obstáculos existentes
-        this.obstacleInterval = 2000;
+        this.entityManager.resetEntities();
+        this.speedManager.resetSpeed(initialSpeed);
+        this.scoreManager.resetScore();
+        this.livesManager.resetHearts();
+        this.collissionManager.setHitStartTime(0);
+        this.character = new Character(this);
+        this.floor = new Floor();
+        this.background = new Background();
 
-        this.dinosaur = new Dinosaur();  // Reinicia el dinosaurio
-        this.floor = new Floor();  // Reinicia el suelo
-        this.background = new Background();  // Reinicia el fondo
-        this.score = 0;
-        this.scoreTimer = 0;
+        this.keyHandler.setcharacter(character);
+        this.lastTime = System.nanoTime();
+        this.gameState = showTitleOnce ? GameState.PLAYING : GameState.TITLE;
 
-        this.keyHandler.setDinosaur(this.dinosaur);
-
-        this.lastTime = System.nanoTime();  // Reiniciar el cálculo de deltaTime
-        this.hitStartTime = 0;  // Reinicia el tiempo de colisión
-
-        
-        // Luego de reiniciar, se puede volver a ejecutar el juego:
         this.running = true;
-        new Thread(this).start();  // Iniciar un nuevo hilo de ejecución
+        new Thread(this).start();
+
         repaint();
     }
 
     @Override
     public void run() {
         while (running) {
+            long startTime = System.nanoTime(); // Start time to measure deltaTime
             updateGame();
             repaint();
+
+            long elapsedTime = System.nanoTime() - startTime;
+            long sleepTime = Math.max(0, (16_666_667L - elapsedTime) / 1000000); // Aim for 60 FPS (16ms per frame)
             try {
-                Thread.sleep(16);
-            } catch (Exception e) {
+                Thread.sleep(sleepTime);
+            } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
     }
 
+    //Update the game changes in every loop
+
     private void updateGame() {
-        if (!running) {
-            return;
-        }
-    
-        if (gameOver) {
-            // Solo actualizamos la pantalla de Game Over, pero no hacemos más lógica de juego
-            return;
-        }
-    
-        // Calcular deltaTime
-        long now = System.nanoTime();
-        deltaTime = (now - lastTime) / 1000000000.0; // Convertir a segundos
-        lastTime = now;
-    
-        // Si el dinosaurio está en estado HIT
-        if (dinosaur.getCurrentState() == Dinosaur.State.HIT) {
-            dinosaur.update(); // Asegurarse de que la animación de HIT se actualice
-            long elapsedTime = System.currentTimeMillis() - hitStartTime;
-    
-            if (elapsedTime >= HIT_DURATION) { // Pasar a gameOver después de la animación
-                gameOver = true;
-                // Mantenemos el juego en estado "gameOver", pero no detenemos el juego
-                // No cambiamos running = false aquí
-            }
-    
-            return; // No actualizamos más elementos
-        }
-    
-        // Actualizar elementos del juego si no estamos en HIT
-        increaseSpeed();
-        dinosaur.update();
-        floor.update(deltaTime, currentSpeed);
+        if (!running) return;
 
-        boolean collisionDetected = false;
-    
-        for (int i = 0; i < obstacleList.size(); i++) {
-            Obstacle obstacle = obstacleList.get(i);
-            obstacle.update(deltaTime, currentSpeed);
+        getDeltaTime();
 
-            if (dinosaur.geHitbox().intersects(obstacle.getHitbox())) {
-                collisionDetected = true;
-    
-                if (!dinosaur.hasCollided()) { // Evitar múltiples activaciones
-                    dinosaur.onCollision();
-                    soundPlayer.setFile(2);
-                    soundPlayer.play();
-                    hitStartTime = System.currentTimeMillis();
+        switch (gameState) {
+            case INTRO:
+                if (System.currentTimeMillis() - introStartTime >= 5000) {
+                    gameState = GameState.TITLE;
                 }
-                break; // Salir del bucle, ya que detectamos una colisión
-            }
-    
-            if (obstacle.isOutOfScreen()) {
-                obstacleList.remove(i);
-                i--;
-            }
-        }
+                break;
 
-        if (!collisionDetected && dinosaur.hasCollided()) {
-            // Restablecer el estado del dinosaurio si ya no hay colisión
-            dinosaur.setCollided(false);
-        }
-    
-        // Generar el puntaje
-        scoreTimer++;
-        if (scoreTimer >= SCORE_DELAY) {
-            score++;
-            scoreTimer = 0;
-        }
-    
-        // Generar nuevos obstáculos
-        generateObstacles();
-    }
+            case TITLE:
+                character.update();
+                background.update(deltaTime, 100);
+                break;
 
-    private void generateObstacles() {
-        long currentTime = System.currentTimeMillis();
+            case PLAYING:
+                if (gameOver)
+                    return;
 
-        // Generar un nuevo obstáculo si ha pasado suficiente tiempo
-        if (currentTime - lastObstacleTime >= obstacleInterval) {
-            int width = 48;
-            int height = 48;
+                if (collissionManager.ischaracterHit(character)) {
+                    character.setCurrentState(Character.State.RUNNING);
+                }
+                speedManager.update();
+                character.update();
+                scoreManager.update();
+                floor.update(deltaTime, speedManager.getCurrentSpeed());
+                background.update(deltaTime, 100);
+                entityManager.update(deltaTime, speedManager.getCurrentSpeed(), character);
+                collissionManager.handleCollisions(character, entityManager.getEntityList());
 
-            obstacleList.add(new Obstacle(width, height));
-            lastObstacleTime = currentTime;
+                if (livesManager.checkHearts()) {
+                    gameOver = true;
+                    gameState = GameState.GAME_OVER;
+                }
+                break;
+
+            case GAME_OVER:
+                break;
         }
     }
 
-    private void increaseSpeed() {
-        long currentTime = System.currentTimeMillis();
-
-        // Incrementar la velocidad cada `speedIncreaseInterval`
-        if (currentTime - lastSpeedIncreaseTime >= speedIncreaseInterval) {
-            currentSpeed += 50;
-            lastSpeedIncreaseTime = currentTime;
-
-            // Opcional: reduce el tiempo entre obstáculos para aumentar dificultad
-            obstacleInterval = Math.max(500, obstacleInterval - 200);
-        }
-    }
+    //Choose what to paint depending on the game state
 
     @Override
     protected void paintComponent(Graphics g) {
-
         super.paintComponent(g);
 
+        switch (gameState) {
+            case INTRO:
+                IntroScreen.drawIntroScreen(g, customBoldFont, getWidth(), getHeight());
+                break;
+
+            case TITLE:
+                TitleScreen.drawTitleScreen(g, customFont, getWidth(), getHeight(), this, background, floor, character);
+                break;
+
+            case PLAYING:
+                drawGame(g);
+                break;
+
+            case GAME_OVER:
+                drawGame(g);
+                GameOverScreen.gameOverScreen(g, getWidth(), getHeight(), scoreManager.getScore(), this);
+                break;
+        }
+    }
+
+    //Draw the game on the screen
+
+    private void drawGame(Graphics g) {
         background.draw(g, getWidth(), getHeight());
         floor.draw(g);
-        dinosaur.draw(g);
+        character.draw(g);
+        characterFrame.draw(g);
 
-        for (Obstacle obstacle : obstacleList) {
-            obstacle.draw(g);
+        for (AbstractEntity entity : entityManager.getEntityList()) {
+            if (entity instanceof AbstractItem) {
+                entity.draw(g);
+            } else if (entity instanceof AbstractObstacle) {
+                entity.draw(g);
+            }
         }
 
-        g.setColor(Color.WHITE);
-        g.setFont(customFont);
-        g.drawString("Score: " + score, 20, 20);
-
-        if (gameOver) {
-            g.setColor(Color.RED); 
-            g.setFont(customBoldFont);
-
-            FontMetrics metrics = g.getFontMetrics(customBoldFont);
-            String gameOver = "GAME OVER";
-            int gameOverX = (getWidth() - metrics.stringWidth(gameOver)) / 2;
-            int gameOverY = getHeight() / 2 - 20;
-            g.drawString(gameOver, gameOverX, gameOverY);
-
-           
-            g.setFont(customFont);
-            metrics = g.getFontMetrics(customFont);
-
-            String scoreText = "Your score is: " + score;
-            int scoreX = (getWidth() - metrics.stringWidth(scoreText)) / 2;
-            int scoreY = gameOverY + 30;
-            g.drawString(scoreText, scoreX, scoreY);
-            
-
-            String restartText = "Press enter to play again!";
-            int restartX = (getWidth() - metrics.stringWidth(restartText)) / 2;
-            int restartY = scoreY + 30;
-            g.drawString(restartText, restartX, restartY);
+        for (Heart heart : livesManager.getHearts()) {
+            heart.draw(g);
         }
+
+        String score = "" + scoreManager.getScore();
+        FontMetrics metrics = g.getFontMetrics(customBoldFont);
+        int textWidth = metrics.stringWidth(score);
+        int posX = (getWidth() - textWidth) / 2;
+        new TextGenerator(score, posX, 40, customFont, Color.WHITE).draw(g);
+    }
+
+    //Helper methods and Getters - Setters
+
+    private void getDeltaTime() {
+        long now = System.nanoTime();
+        deltaTime = (now - lastTime) / 1000000000.0;
+        lastTime = now;
     }
 
     public boolean isGameOver() {
         return gameOver;
+    }
+
+    public GameState getGameState() {
+        return gameState;
+    }
+
+    public void setGameState(GameState gameState) {
+        this.gameState = gameState;
     }
 }
