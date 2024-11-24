@@ -10,6 +10,7 @@ Welcome to **Run or Croak**, a fast-paced 2D action game where you control a dar
 
 ## 🌟 **Table of Contents**
 - [🎮 Game Overview](#-game-overview)
+- [🚀 How to Run the Game](#-run-the-game)
 - [⚙️ Principles and Design Patterns](#️-principles-and-design-patterns)
 - [📜 Game Instructions](#-game-instructions)
 - [💻 Technologies Used](#-technologies-used)
@@ -40,7 +41,37 @@ Your goal is simple: **survive as long as possible!** Control your character as 
 - **Game Over Screen**: Shows your final score and lets you restart.
 
 
+## 🚀 How to Run the Game
 
+### 🔗 **Option 1: Run the `.jar` File**
+1. **Download the game**:
+   - [⬇️ Download `run-or-croak.jar`](https://github.com/Sebaspallero/run-or-croak/raw/run-or-croak.jar)
+2. **Install Java**: Ensure you have **Java JRE 8 or higher** installed on your system. [Get Java here](https://www.oracle.com/java/technologies/javase-downloads.html).
+3. **Run the game**:
+   Open a terminal and use the following command:
+
+   ```bash
+   java -jar RunOrCroak.jar
+   ```
+### 🛠️ Option 2: Run the Code in your IDE
+If you'd like to explore or modify the code, follow these steps:
+
+1. **Install Java JDK**: 
+    - [⬇️ JDK Development Kit](https://www.oracle.com/java/technologies/downloads/?er=221886)
+
+2. **Install "Java Extension Pack"**: If you are using Visual Studio Code, go to the Extensions view (`Ctrl+Shift+X` or `Cmd+Shift+X` on macOS) and search for "Java Extension Pack." 
+
+2. **Clone the repository**:
+
+   ```bash
+   git clone https://github.com/your-username/RunOrCroak.git
+   ```
+
+3. **Compile and run**:
+   ```bash
+   javac -d bin -sourcepath src src/game/main/Game.java
+   java -cp bin game.main.Game
+   ```
 ## ⚙️ Principles and Design Patterns
 
 The game was built with clean coding principles and utilizes multiple software design patterns for flexibility and scalability:
