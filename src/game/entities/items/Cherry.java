@@ -1,19 +1,20 @@
 package game.entities.items;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Image;
+
 import javax.imageio.ImageIO;
+
 import game.entities.Hitbox;
 import game.utils.Animator;
 
 public class Cherry extends AbstractItem {
 
-    private State currentState;
+    private Animator animator;
 
-    // Sprites estáticos cargados una sola vez
     private static Image idleSprite;
     private static Image collectedSprite;
-
     static {
         try {
             idleSprite = ImageIO.read(Cherry.class.getResource("/resources/sprites/cherries.png"));
@@ -25,9 +26,9 @@ public class Cherry extends AbstractItem {
     }
 
     public Cherry(int x, int y) {
-        super(x, y, 64, 64, new Hitbox(x, y, 32, 32));
-        this.currentState = State.IDLE;
-        animator = new Animator(idleSprite, 64, 64, 17, 50, 0);
+        super(x, y, 64, 64, new Hitbox(800, 150, 28, 28));
+        this.animator = new Animator(idleSprite, 64, 64, 17, 80, 0); // Configura el Animator
+
     }
 
     @Override
@@ -39,7 +40,19 @@ public class Cherry extends AbstractItem {
         hitbox.update(x + 20, y + 20);
     }
 
-    public void setState(State newState) {
+    @Override
+    public void draw(Graphics g) {
+        if (animator != null) {
+            animator.draw(g, x, y, width, height);
+            /* hitbox.draw(g); */
+        } else {
+            g.setColor(Color.BLUE);
+            g.fillRect(x, y, width, height);
+        }
+    }
+
+    @Override
+    public void setCurrentState(State newState) {
         if (newState != currentState) {
             this.currentState = newState;
             switch (newState) {
@@ -53,10 +66,4 @@ public class Cherry extends AbstractItem {
         }
     }
 
-    @Override
-    public void draw(Graphics g) {
-        if (animator != null) {
-            animator.draw(g, x, y, width, height);
-        }
-    }
 }

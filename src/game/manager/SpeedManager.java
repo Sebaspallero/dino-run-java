@@ -20,7 +20,7 @@ public class SpeedManager {
         }
     }
 
-    public void resetSpeed(int initialSpeed){
+    public void resetSpeed(int initialSpeed) {
         this.currentSpeed = initialSpeed;
         this.lastSpeedIncreaseTime = System.currentTimeMillis();
     }
@@ -28,6 +28,5 @@ public class SpeedManager {
     public int getCurrentSpeed() {
         return currentSpeed;
     }
-
 
 }

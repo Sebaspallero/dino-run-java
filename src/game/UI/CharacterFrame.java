@@ -1,4 +1,5 @@
 package game.UI;
+
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Image;
@@ -13,7 +14,6 @@ public class CharacterFrame {
     private int y;
     private Image image;
 
-
     public CharacterFrame() {
         this.width = 48;
         this.height = 48;
@@ -21,9 +21,9 @@ public class CharacterFrame {
         this.y = 10;
 
         initializaImage();
-    }    
+    }
 
-    public void initializaImage(){
+    public void initializaImage() {
         try {
             image = ImageIO.read(getClass().getResource("/resources/sprites/character-frame.png"));
         } catch (Exception e) {
@@ -33,12 +33,11 @@ public class CharacterFrame {
 
     public void draw(Graphics g) {
         try {
-            g.drawImage(image, x, y, width, height,null);
+            g.drawImage(image, x, y, width, height, null);
         } catch (Exception e) {
-            g.setColor(Color.BLACK);         
+            g.setColor(Color.BLACK);
             g.fillRect(x, y, width, height);
         }
     }
 
 }
-

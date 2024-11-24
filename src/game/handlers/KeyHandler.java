@@ -3,18 +3,18 @@ package game.handlers;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
-import game.entities.character.Dinosaur;
+import game.entities.character.Character;
 import game.main.GamePanel;
 import game.utils.SoundPlayer;
 
-public class KeyHandler implements KeyListener{
+public class KeyHandler implements KeyListener {
 
-    private Dinosaur dinosaur;
+    private Character character;
     private SoundPlayer soundPlayer;
     private GamePanel gamePanel;
 
-    public KeyHandler(Dinosaur dinosaur, GamePanel gamePanel){
-        this.dinosaur = dinosaur;
+    public KeyHandler(Character character, GamePanel gamePanel) {
+        this.character = character;
         this.gamePanel = gamePanel;
         this.soundPlayer = new SoundPlayer();
         soundPlayer.setFile(0);
@@ -22,55 +22,54 @@ public class KeyHandler implements KeyListener{
 
     @Override
     public void keyTyped(KeyEvent e) {
-        
+
     }
 
     @Override
-public void keyPressed(KeyEvent e) {
-    if (e.getKeyCode() == KeyEvent.VK_SPACE) {
-        switch (gamePanel.getGameState()) {
-            case TITLE:
-                gamePanel.setGameState(GamePanel.GameState.PLAYING);
-                break;
+    public void keyPressed(KeyEvent e) {
+        if (e.getKeyCode() == KeyEvent.VK_SPACE) {
+            switch (gamePanel.getGameState()) {
+                case TITLE:
+                    gamePanel.setGameState(GamePanel.GameState.PLAYING);
+                    break;
 
-            case PLAYING:
-                if (dinosaur.getCurrentState() != Dinosaur.State.HIT) {
-                    dinosaur.jump();
-                    soundPlayer.play();
-                }
-                break;
+                case PLAYING:
+                    if (character.getCurrentState() != Character.State.HIT) {
+                        character.jump();
+                        soundPlayer.play();
+                    }
+                    break;
 
-            default:
-                break;
+                default:
+                    break;
+            }
         }
-    }
 
-    if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-        if (gamePanel.isGameOver()) {
-            gamePanel.resetGame();
+        if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+            if (gamePanel.isGameOver()) {
+                gamePanel.resetGame();
+            }
         }
-    }
 
-    if (e.getKeyCode() == KeyEvent.VK_DOWN) {
-        if (gamePanel.getGameState() == GamePanel.GameState.PLAYING &&
-            dinosaur.getCurrentState() != Dinosaur.State.HIT) {
-            dinosaur.crouch();
-        }
-    }
-}
-
-
-    @Override
-    public void keyReleased(KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_DOWN) {
-            if (dinosaur.getCurrentState() != Dinosaur.State.HIT) {
-                dinosaur.stand();
+            if (gamePanel.getGameState() == GamePanel.GameState.PLAYING &&
+                    character.getCurrentState() != Character.State.HIT) {
+                character.crouch();
             }
         }
     }
 
-    public void setDinosaur(Dinosaur dinosaur) {
-        this.dinosaur = dinosaur;
+    @Override
+    public void keyReleased(KeyEvent e) {
+        if (e.getKeyCode() == KeyEvent.VK_DOWN) {
+            if (character.getCurrentState() != Character.State.HIT) {
+                character.stand();
+            }
+        }
+    }
+
+    public void setcharacter(Character character) {
+        this.character = character;
     }
 
 }

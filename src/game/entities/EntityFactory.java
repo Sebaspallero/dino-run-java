@@ -10,61 +10,76 @@ public class EntityFactory {
 
     private static final Random RANDOM = new Random();
 
-    // Método para crear ítems
-    public static List<AbstractItem> createItems() {
-        List<AbstractItem> items = new ArrayList<>();
-        int patternType = RANDOM.nextInt(2); // 0 = línea, 1 = triángulo
+    public static List<AbstractEntity> createEntity() {
+        List<AbstractEntity> entities = new ArrayList<>();
+        int entityType = RANDOM.nextInt(6);
 
-        switch (patternType) {
+        switch (entityType) {
             case 0:
-                items.addAll(generateLinePattern()); // Genera un patrón en línea
+                entities.add(new Bird());
                 break;
             case 1:
-                items.addAll(generateTrianglePattern()); // Genera un patrón triangular
+                entities.add(new Spike(800));
+                break;
+            case 2:
+                entities.addAll(generateLinePattern());
+                break;
+            case 3:
+                entities.addAll(generateTrianglePattern());
+                break;
+            case 4:
+                entities.add(new Pig());
+                break;
+            case 5:
+                entities.add(new Bee(800, 75, 180));
                 break;
             default:
-                throw new IllegalStateException("Patrón de ítems no válido");
+                throw new IllegalStateException("Unexpected value: " + entityType);
         }
 
-        return items;
+        return entities;
     }
 
-    // Método para crear obstáculos
-    public static List<AbstractObstacle> createObstacles() {
-        List<AbstractObstacle> obstacles = new ArrayList<>();
-        int obstacleType = RANDOM.nextInt(2); // 0 = Spike, 1 = Bird
-
-        switch (obstacleType) {
-            case 0:
-                obstacles.add(new Spike());
-                break;
-            case 1:
-                obstacles.add(new Bird());
-                break;
-            default:
-                throw new IllegalStateException("Tipo de obstáculo no válido");
-        }
-
-        return obstacles;
-    }
-
-    // Genera un patrón en línea de cerezas
+    // Random line pattern
     private static List<AbstractItem> generateLinePattern() {
         List<AbstractItem> items = new ArrayList<>();
         int randomAmount = RANDOM.nextInt(5) + 1;
         for (int i = 0; i < randomAmount; i++) {
-            items.add(new Cherry(800 + i * 50, 170));
+            items.add(new Cherry(800 + i * 50, 200));
         }
         return items;
     }
 
-    // Genera un patrón triangular de cerezas
+    // Triangle pattern
     private static List<AbstractItem> generateTrianglePattern() {
         List<AbstractItem> items = new ArrayList<>();
-        items.add(new Cherry(800, 170)); // Inferior
-        items.add(new Cherry(750, 120)); // Izquierda
-        items.add(new Cherry(850, 120)); // Derecha
-        items.add(new Cherry(800, 70));  // Superior
+        items.add(new Cherry(800, 200));// bottom
+        items.add(new Cherry(750, 150));// left
+        items.add(new Cherry(850, 150));// right
+        items.add(new Cherry(800, 100));// top
         return items;
     }
+
+    // Arrow pattern
+
+    //private static List<AbstractItem> generateArrowPattern() {
+    //    List<AbstractItem> items = new ArrayList<>();
+    //    items.add(new Cherry(800, 150));// Body left
+    //    items.add(new Cherry(850, 150));// Body mid
+    //    items.add(new Cherry(900, 150));// Body right
+    //    items.add(new Cherry(950, 200));// lower arrow
+    //    items.add(new Cherry(950, 100));// upper arrow
+    //    items.add(new Cherry(1000, 150));// right arrow
+    //    return items;
+    // }
+ 
+    //private static List<AbstractObstacle> generateSpikesLines() {
+    //    List<AbstractObstacle> spikes = new ArrayList<>();
+    //    int randomAmount = RANDOM.nextInt(3) + 1;
+    //    for (int i = 0; i < randomAmount; i++) {
+    //        spikes.add(new Spike(800 + i * 200));
+    //    }
+    //    return spikes;
+    // } 
+
 }

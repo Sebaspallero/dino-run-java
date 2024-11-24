@@ -8,17 +8,23 @@ import javax.imageio.ImageIO;
 
 import game.entities.Hitbox;
 
-public class Spike extends AbstractObstacle{
-    
+public class Spike extends AbstractObstacle {
+
     private Image image;
 
-    public Spike(){
-        super(800, 182, 48, 48, new Hitbox(800, 100, 22, 40));
+    public Spike(int x) {
+        super(x, 222, 48, 48, new Hitbox(800, 100, 22, 40));
         try {
             image = ImageIO.read(getClass().getResource("/resources/sprites/spikes-001.png"));
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void update(double deltaTime, int currentSpeed) {
+        x -= deltaTime * currentSpeed;
+        hitbox.update(x, y + 25);
     }
 
     @Override

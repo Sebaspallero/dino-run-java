@@ -17,9 +17,10 @@ public class SoundPlayer {
 
     public SoundPlayer(){
         soundUrl[0] = getClass().getResource("/resources/sfx/game-jump.wav");
-        soundUrl[1] = getClass().getResource("/resources/sfx/game-start.wav");
+        soundUrl[1] = getClass().getResource("/resources/sfx/coin.wav");
         soundUrl[2] = getClass().getResource("/resources/sfx/game-over.wav");
         soundUrl[3] = getClass().getResource("/resources/sfx/background-music.wav");
+        soundUrl[4] = getClass().getResource("/resources/sfx/hurt.wav");
     }
 
     public void setFile(int index){

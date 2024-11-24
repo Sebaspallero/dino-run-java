@@ -9,11 +9,11 @@ import javax.imageio.ImageIO;
 import game.entities.Hitbox;
 import game.utils.Animator;
 
-public class Bird extends AbstractObstacle{
+public class Bird extends AbstractObstacle {
     private Animator animator;
 
-    public Bird(){
-        super(800, 140, 64, 64, new Hitbox(800, 150, 28, 28));
+    public Bird() {
+        super(800, 180, 64, 64, new Hitbox(800, 150, 28, 28));
 
         try {
             Image birdSpriteSheet = ImageIO.read(getClass().getResource("/resources/sprites/blue-bird.png"));
@@ -27,7 +27,7 @@ public class Bird extends AbstractObstacle{
     public void update(double deltaTime, int currentSpeed) {
         x -= deltaTime * currentSpeed;
         if (animator != null) {
-            animator.update(); 
+            animator.update();
         }
         hitbox.update(x + 20, y + 20);
     }

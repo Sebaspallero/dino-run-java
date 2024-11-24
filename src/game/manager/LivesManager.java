@@ -1,15 +1,14 @@
 package game.manager;
 
-
 import java.util.ArrayList;
 import java.util.List;
 
 import game.UI.Heart;
-import game.entities.character.Dinosaur;
+import game.entities.character.Character;
 
 public class LivesManager {
 
-    private List <Heart> hearts = new ArrayList<>();
+    private List<Heart> hearts = new ArrayList<>();
     private final int FIRST = 65;
     private final int SECOND = 97;
     private final int THIRD = 129;
@@ -20,8 +19,8 @@ public class LivesManager {
         hearts.add(new Heart(THIRD, true));
     }
 
-    public void updateHeart(Dinosaur dinosaur){
-        if (dinosaur.hasCollided()) {
+    public void updateHeart(Character character) {
+        if (character.hasCollided()) {
             for (int i = 2; i >= 0; i--) {
                 if (hearts.get(i).isFull()) {
                     hearts.get(i).setFull(false);
@@ -31,7 +30,7 @@ public class LivesManager {
         }
     }
 
-    public boolean checkHearts(){
+    public boolean checkHearts() {
         if (hearts.get(0).isFull()) {
             return false;
         } else {
@@ -39,16 +38,16 @@ public class LivesManager {
         }
     }
 
-    public void resetHearts(){
+    public void resetHearts() {
         hearts.clear();
-        
+
         hearts.add(new Heart(FIRST, true));
         hearts.add(new Heart(SECOND, true));
         hearts.add(new Heart(THIRD, true));
     }
 
-    public List <Heart> getHearts() {
+    public List<Heart> getHearts() {
         return hearts;
     }
-    
+
 }

@@ -3,10 +3,10 @@ package game.main;
 import java.awt.*;
 import javax.swing.JFrame;
 
-public class Game extends JFrame{
+public class Game extends JFrame {
 
     public static final int SCREEN_WIDTH = 750;
-    public static final int SCREEN_HEIGHT = 350;
+    public static final int SCREEN_HEIGHT = 390;
 
     public static void main(String[] args) {
         JFrame frame = new JFrame("Run or Croak");
@@ -23,5 +23,5 @@ public class Game extends JFrame{
 
         gp.startGame();
     }
-    
+
 }

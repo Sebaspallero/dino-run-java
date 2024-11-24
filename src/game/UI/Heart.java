@@ -14,7 +14,6 @@ public class Heart {
     private boolean isFull;
     private Image heart;
 
-
     public Heart(int x, boolean isFull) {
         this.width = 12 * 2;
         this.height = 12 * 2;
@@ -23,9 +22,9 @@ public class Heart {
         this.isFull = isFull;
 
         initializeHeartImage();
-    }    
+    }
 
-    public void initializeHeartImage(){
+    public void initializeHeartImage() {
         try {
             if (isFull) {
                 heart = ImageIO.read(getClass().getResource("/resources/sprites/full-heart.png"));
@@ -46,13 +45,11 @@ public class Heart {
         return this.isFull;
     }
 
-
-
     public void draw(Graphics g) {
         try {
-            g.drawImage(heart, x, y, width, height,null);
+            g.drawImage(heart, x, y, width, height, null);
         } catch (Exception e) {
-            g.setColor(Color.BLACK);         
+            g.setColor(Color.BLACK);
             g.fillRect(x, y, width, height);
         }
     }

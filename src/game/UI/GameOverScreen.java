@@ -11,19 +11,20 @@ import game.utils.TextGenerator;
 
 public class GameOverScreen {
 
-    public static void gameOverScreen(Graphics g, int width, int height, int score, GamePanel gp){
+    public static void gameOverScreen(Graphics g, int width, int height, int score, GamePanel gp) {
         Font customFont = FontLoader.loadFont("/resources/font/AvenuePixel-Regular.ttf", 40f);
         Font customBoldFont = FontLoader.loadFont("/resources/font/AvenuePixelStroke-Regular.ttf", 70f);
-        
+
         FontMetrics metrics = g.getFontMetrics(customBoldFont);
 
-        g.setColor(new Color(33, 31, 48)); // Fondo semitransparente
+        g.setColor(new Color(33, 31, 48));
         g.fillRect(0, 0, gp.getWidth(), gp.getHeight());
 
         String gameOver = "GAME OVER";
         int gameOverX = (width - metrics.stringWidth(gameOver)) / 2;
         int gameOverY = height / 2 - 20;
-        TextGenerator gameOverText = new TextGenerator(gameOver, gameOverX, gameOverY, customBoldFont, new Color(204, 48, 72));
+        TextGenerator gameOverText = new TextGenerator(gameOver, gameOverX, gameOverY, customBoldFont,
+                new Color(204, 48, 72));
         gameOverText.draw(g);
 
         metrics = g.getFontMetrics(customFont);
@@ -33,13 +34,13 @@ public class GameOverScreen {
         int scoreY = gameOverY + 50;
         TextGenerator scText = new TextGenerator(scoreText, scoreX, scoreY, customFont, new Color(255, 255, 255));
         scText.draw(g);
-        
 
         String restart = "Press ENTER to play again!";
         int restartX = (width - metrics.stringWidth(restart)) / 2;
-        int restartY = scoreY + 40;
-        TextGenerator restartText = new TextGenerator(restart, restartX, restartY, customFont, new Color(255, 255, 255));
+        int restartY = scoreY + 50;
+        TextGenerator restartText = new TextGenerator(restart, restartX, restartY, customFont,
+                new Color(255, 255, 255));
         restartText.draw(g);
     }
-            
+
 }

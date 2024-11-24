@@ -6,18 +6,18 @@ import javax.imageio.ImageIO;
 
 public class Background {
 
-    private Image image;   
-    private int imageWidth; 
-    private int imageHeight; 
-    private int offsetY; 
+    private Image image;
+    private int imageWidth;
+    private int imageHeight;
+    private int offsetY;
 
     public Background() {
         this.offsetY = 0;
 
         try {
             image = ImageIO.read(getClass().getResource("/resources/sprites/background-001.png"));
-            imageWidth = image.getWidth(null); 
-            imageHeight = image.getHeight(null); 
+            imageWidth = image.getWidth(null);
+            imageHeight = image.getHeight(null);
         } catch (IOException e) {
             e.printStackTrace();
         }

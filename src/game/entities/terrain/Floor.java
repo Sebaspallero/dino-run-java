@@ -14,7 +14,6 @@ public class Floor {
     private int screen_width;
     private Image image;
 
-
     public Floor() {
         this.screen_width = Game.SCREEN_WIDTH;
         this.width = 750 * 2;
@@ -29,7 +28,7 @@ public class Floor {
         }
     }
 
-    public void update(double deltaTime, int currentSpeed){
+    public void update(double deltaTime, int currentSpeed) {
         x -= deltaTime * currentSpeed;
         if (x + width <= 0) {
             x = 0;
@@ -39,7 +38,7 @@ public class Floor {
     public void draw(Graphics g) {
         g.drawImage(image, x, y, width, height, null);
 
-        if ( x + width < screen_width) {
+        if (x + width < screen_width) {
             g.drawImage(image, x + width, y, width, height, null);
         }
     }
