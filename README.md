@@ -13,7 +13,6 @@ Welcome to **Run or Croak**, a fast-paced 2D action game where you control a dar
 - [⚙️ Principles and Design Patterns](#️-principles-and-design-patterns)
 - [📜 Game Instructions](#-game-instructions)
 - [💻 Technologies Used](#-technologies-used)
-- [🖼️ Screenshots & GIFs](#️-screenshots--gifs)
 - [✨ Credits](#-credits)
 
 
