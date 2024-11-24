@@ -45,7 +45,7 @@ Your goal is simple: **survive as long as possible!** Control your character as 
 
 ### 🔗 **Option 1: Run the `.jar` File**
 1. **Download the game**:
-   - [⬇️ Download `run-or-croak.jar`](https://github.com/Sebaspallero/run-or-croak/raw/run-or-croak.jar)
+   - ⬇️ Download [`run-or-croak.jar`](https://github.com/Sebaspallero/run-or-croak/raw/development/run-or-croak.jar)
 2. **Install Java**: Ensure you have **Java JRE 8 or higher** installed on your system. [Get Java here](https://www.oracle.com/java/technologies/javase-downloads.html).
 3. **Run the game**:
    Open a terminal and use the following command:
